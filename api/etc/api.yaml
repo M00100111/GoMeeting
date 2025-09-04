@@ -1,0 +1,21 @@
+Name: api
+Host: 0.0.0.0
+Port: 8080
+
+JwtAuth:
+  AccessSecret: uOvKLmVfztaXGpNYd4Z0I1SiT7MweJhl
+  AccessExpire: 86400
+
+Redis:
+  Host: 127.0.0.1:6379
+  Pass: meeting
+  Type: node
+
+#注册RPC服务
+UserRpc:
+  Etcd:
+    Hosts:
+      #        - etcd:2379
+      - 127.0.0.1:2379
+    Key: user.rpc
+

@@ -1,0 +1,18 @@
+syntax= "v1"
+
+type(
+    PingReq{
+        Msg string `json:"msg"`
+    }
+    PingResp{
+        Msg string `json:"msg"`
+    }
+
+    CaptchaReq{
+        Email string `json:"email"`
+        Expire int64 `json:"expire"`
+    }
+    CaptchaResp{
+        Msg string `json:"msg"`
+    }
+)

@@ -1,0 +1,44 @@
+syntax = "proto3";  //指定协议版本
+package user; //默认包名,用于proto文件
+option go_package = "./user"; //默认包名,用于生成的代码
+
+//定义服务名
+service User{
+  //定义功能及请求与响应结构体
+  rpc Ping(PingReq) returns (PingResp);
+  rpc SignUp(SignUpReq) returns (SignUpResp);
+  rpc Login(LoginReq) returns (LoginResp);
+}
+
+message PingReq{
+  string msg = 1;
+}
+message PingResp{
+  string msg = 1;
+}
+
+message SignUpReq{
+  string email = 1;
+  string username = 2;
+  string password = 3;
+  string captcha = 4; // 验证码
+  int32 sex = 5;
+  string avatar = 6;
+}
+message SignUpResp{
+  string msg = 1;
+}
+
+//登录功能请求与响应结构体
+message LoginReq{
+  string email = 1;
+  string captcha = 2;
+  string password = 3;
+}
+
+message LoginResp{
+  string token = 1;
+  int64 expire = 2;
+  string userId = 3;
+  string msg = 4;
+}

@@ -1,0 +1,58 @@
+# 网络配置
+networks:
+  meeting:
+    driver: bridge # 设置网络模式
+
+# 服务容器配置
+# 在配置文件中，所有的容器通过services来定义
+services:
+  #  配置etcd
+  etcd:
+    image: bitnami/etcd:latest # 不指定tag默认使用latest
+    container_name: meeting_etcd
+    ports:
+      - "2379:2379"
+    volumes:
+      - ${DATA_HOST}/etcd/data:/bitnami/etcd/data
+      - ${DATA_HOST}/etcd/logs:/bitnami/etcd/logs
+    networks:
+      meeting:
+    restart: always
+    environment:
+      - TZ=${TZ} # 设置时区
+      - ALLOW_NONE_AUTHENTICATION=yes # 允许没有密码的访问
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379 # 配置etcd的监听地址
+      - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379 # 配置etcd的广播地址
+      - ETCD_NAME=etcd # 配置etcd节点的名称(用于集群)
+
+  #  配置数据库
+  mysql:
+    image: mysql:5.7 # 所使用的镜像
+    container_name: meeting_mysql # 容器名称,docker构建的容器名唯一
+    ports:
+      - "3306:3306" # 映射端口
+    volumes:
+      - ${DATA_HOST}/mysql/data:/var/lib/mysql #设置数据库目录映射
+      - /etc/localtime:/etc/localtime # 设置时区
+    networks:
+      - meeting # 添加到mall网络
+    restart: always # 服务启动后，自动重启
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD} # 设置root密码
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 启动命令,设置字符集和字符集比较规则
+
+  #  配置Redis缓存
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    container_name: meeting_redis
+    volumes:
+      - ${DATA_HOST}/redis/data:/data
+      - ${DATA_HOST}/redis/config/redis.conf:/usr/local/redis/config/redis.conf
+    environment:
+      TZ: Asia/Shanghai
+    restart: always
+    networks:
+      meeting:
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes

@@ -1,0 +1,27 @@
+syntax= "v1"
+
+type(
+    SignUpReq{
+        Email string `json:"email"`
+        Username string `json:"username"`
+        Password string `json:"password"`
+        Captcha string  `json:"captcha"`
+        Sex int32 `json:"sex"`
+        Avatar string `json:"avatar"`
+    }
+    SignUpResp{
+        Msg string `json:"msg"`
+    }
+
+    LoginReq{
+        Email string `json:"email"`
+        Password string `json:"password"`
+        Captcha string  `json:"captcha"`
+    }
+    LoginResp{
+        Token string `json:"token"`
+        Expire int64 `json:"expire"`
+        UserId int64 `json:"user_id"`
+        Msg string `json:"msg"`
+    }
+)
