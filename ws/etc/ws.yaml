@@ -1,0 +1,7 @@
+Name: ws
+ListenOn: 0.0.0.0:8081
+Pattern: "/ws"
+
+Jwt:
+  AccessSecret: meeting
+  AccessExpire: 8640000
