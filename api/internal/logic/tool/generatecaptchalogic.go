@@ -30,24 +30,22 @@ func NewGenerateCaptchaLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 	}
 }
 
-func (l *GenerateCaptchaLogic) GenerateCaptcha(req *types.CaptchaReq) (resp *types.CaptchaResp, err error) {
+func (l *GenerateCaptchaLogic) GenerateCaptcha(req *types.CaptchaReq) (resp *types.Result, err error) {
 	value := captcha.GenerateCaptcha()
 	key := ctxdata.CAPTCHA_KEY_PREFIX + req.Email
 
 	err = email.SendEmail(req.Email, value)
 	if err != nil {
 		logx.Errorf("发送验证码到邮箱 %v 失败: %v", req.Email, err)
-		return nil, err
+		return types.NewErrorResultf("发送验证码到邮箱 %v 失败: %v", req.Email, err), err
 	}
 
 	// 设置单个键值对并设置过期时间（5分钟）
 	err = l.svcCtx.Redis.Setex(key, value, int(CAPTCHA_EXPIRE_TIME.Seconds()))
 	if err != nil {
 		logx.Errorf("设置邮箱 %v 的验证码到redis中失败: %v", req.Email, err)
-		return nil, err
+		return types.NewErrorResultf("设置邮箱 %v 的验证码到redis中失败: %v", req.Email, err), err
 	}
 
-	return &types.CaptchaResp{
-		Msg: "已发送验证码到邮箱" + req.Email,
-	}, nil
+	return types.NewSuccessMessageResult("已发送验证码到邮箱" + req.Email), nil
 }

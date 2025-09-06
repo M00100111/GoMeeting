@@ -34,7 +34,7 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 	if in.Email == "" {
 		return &user.LoginResp{
 			Msg: "邮箱不能为空",
-		}, nil
+		}, errors.New("邮箱不能为空")
 	}
 	//查询邮箱是否存在
 	u, err := l.svcCtx.UserModel.FindOneByEmail(l.ctx, in.Email)
@@ -91,6 +91,20 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 			}
 		}()
 	}
+
+	//修改用户上次登录时间
+	u.LastLoginTime = sql.NullTime{
+		Time:  time.Now(),
+		Valid: true,
+	}
+	err = l.svcCtx.UserModel.Update(l.ctx, u)
+	if err != nil {
+		logx.Errorf("更新用户登录时间失败: %v", err)
+		return &user.LoginResp{
+			Msg: "更新用户登录时间失败",
+		}, err
+	}
+
 	//生成token并返回
 	now := time.Now().Unix()
 	token, err := ctxdata.GetJwtToken(l.svcCtx.Config.Jwt.AccessSecret, now, l.svcCtx.Config.Jwt.AccessExpire, strconv.FormatUint(u.UserId, 10))

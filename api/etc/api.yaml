@@ -19,3 +19,8 @@ UserRpc:
       - 127.0.0.1:2379
     Key: user.rpc
 
+MeetingRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: meeting.rpc

@@ -9,6 +9,7 @@ import (
 	"GoMeeting/rpcs/user/rpc/user"
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/zeromicro/go-zero/core/logx"
 	"strconv"
 )
@@ -29,6 +30,7 @@ func NewSignUpLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SignUpLogi
 
 func (l *SignUpLogic) SignUp(in *user.SignUpReq) (*user.SignUpResp, error) {
 	key := ctxdata.CAPTCHA_KEY_PREFIX + in.Email
+
 	// 验证验证码是否正确
 	value, err := l.svcCtx.Redis.Get(key)
 	//Redis Get 操作的行为总结
@@ -45,13 +47,13 @@ func (l *SignUpLogic) SignUp(in *user.SignUpReq) (*user.SignUpResp, error) {
 		logx.Errorf(",验证码已过期或不存在")
 		return &user.SignUpResp{
 			Msg: "验证码已过期或不存在",
-		}, err
+		}, errors.New("验证码已过期或不存在")
 	}
 	if value != in.Captcha {
 		logx.Errorf("验证码错误")
 		return &user.SignUpResp{
 			Msg: "验证码错误",
-		}, err
+		}, errors.New("验证码错误")
 	}
 	// 使用 defer 确保在函数结束时删除验证码
 	//键存在且删除成功：
@@ -79,7 +81,7 @@ func (l *SignUpLogic) SignUp(in *user.SignUpReq) (*user.SignUpResp, error) {
 		logx.Errorf("用户名已存在")
 		return &user.SignUpResp{
 			Msg: "用户名已存在",
-		}, err
+		}, errors.New("用户名已存在")
 	}
 	if err != nil && err != sql.ErrNoRows {
 		logx.Errorf("查询用户名失败: %v", err)
@@ -89,10 +91,10 @@ func (l *SignUpLogic) SignUp(in *user.SignUpReq) (*user.SignUpResp, error) {
 	}
 	_, err = l.svcCtx.UserModel.FindOneByEmail(l.ctx, in.Email)
 	if err == nil {
-		logx.Errorf("邮箱已注册")
+		logx.Errorf("邮箱已被注册")
 		return &user.SignUpResp{
-			Msg: "邮箱已注册",
-		}, err
+			Msg: "邮箱已被注册",
+		}, errors.New("邮箱已被注册")
 	}
 	if err != nil && err != sql.ErrNoRows {
 		logx.Errorf("查询邮箱失败: %v", err)
@@ -117,7 +119,15 @@ func (l *SignUpLogic) SignUp(in *user.SignUpReq) (*user.SignUpResp, error) {
 		Sex:       uint64(in.Sex),
 	})
 
+	u, err := l.svcCtx.UserModel.FindOneByUserId(l.ctx, uint64(userId))
+	if err != nil {
+		return &user.SignUpResp{
+			Msg: "查询用户主键失败",
+		}, err
+	}
+
 	return &user.SignUpResp{
+		Id:  u.Id,
 		Msg: "注册成功",
 	}, nil
 }

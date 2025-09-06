@@ -9,18 +9,7 @@ type LoginReq struct {
 	Captcha  string `json:"captcha"`
 }
 
-type LoginResp struct {
-	Token  string `json:"token"`
-	Expire int64  `json:"expire"`
-	UserId int64  `json:"user_id"`
-	Msg    string `json:"msg"`
-}
-
 type PingReq struct {
-	Msg string `json:"msg"`
-}
-
-type PingResp struct {
 	Msg string `json:"msg"`
 }
 
@@ -31,8 +20,4 @@ type SignUpReq struct {
 	Captcha  string `json:"captcha"`
 	Sex      int32  `json:"sex"`
 	Avatar   string `json:"avatar"`
-}
-
-type SignUpResp struct {
-	Msg string `json:"msg"`
 }

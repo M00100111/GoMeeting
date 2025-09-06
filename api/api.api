@@ -1,6 +1,7 @@
 syntax = "v1"
 
 import (
+	"apis/result.api"
 	"apis/user.api"
 	"apis/tool.api"
 )
@@ -11,15 +12,15 @@ import (
 )
 service api {
 	@handler pinguser
-	get /pinguser (PingReq) returns (PingResp)
+	get /pinguser (PingReq) returns (Result)
 
 	@doc "用户注册"
 	@handler signup
-	post /signup (SignUpReq) returns (SignUpResp)
+	post /signup (SignUpReq) returns (Result)
 
 	@doc "用户登录"
 	@handler login
-	post /login (LoginReq) returns (LoginResp)
+	post /login (LoginReq) returns (Result)
 }
 
 @server (
@@ -29,6 +30,6 @@ service api {
 service api {
 	@doc "申请生成验证码发送到邮箱并存入Redis"
 	@handler generateCaptcha
-	get /captcha (CaptchaReq) returns (CaptchaResp)
+	get /captcha (CaptchaReq) returns (Result)
 }
 

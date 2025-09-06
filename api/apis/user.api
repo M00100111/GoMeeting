@@ -9,9 +9,6 @@ type(
         Sex int32 `json:"sex"`
         Avatar string `json:"avatar"`
     }
-    SignUpResp{
-        Msg string `json:"msg"`
-    }
 
     LoginReq{
         Email string `json:"email"`

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"GoMeeting/rpcs/meeting/rpc/meeting"
 	"GoMeeting/rpcs/user/rpc/user"
 	"context"
 
@@ -25,15 +26,33 @@ func NewSignupLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SignupLogi
 	}
 }
 
-func (l *SignupLogic) Signup(req *types.SignUpReq) (resp *types.SignUpResp, err error) {
-	result, err := l.svcCtx.User.SignUp(l.ctx, &user.SignUpReq{
+func (l *SignupLogic) Signup(req *types.SignUpReq) (resp *types.Result, err error) {
+	result, err := l.svcCtx.UserRpc.SignUp(l.ctx, &user.SignUpReq{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
 		Sex:      req.Sex,
 		Avatar:   req.Avatar,
+		Captcha:  req.Captcha,
 	})
-	resp = &types.SignUpResp{
+	if err != nil {
+		return &types.Result{
+			Msg: result.Msg,
+		}, err
+	}
+
+	//创建对应的会议记录与会议成员记录
+	_, err = l.svcCtx.MeetingRpc.CreateMeeting(l.ctx, &meeting.CreateMeetingReq{
+		UserId:   result.Id,
+		Username: req.Username,
+	})
+	if err != nil {
+		return &types.Result{
+			Msg: "创建会议信息和用户成员信息失败",
+		}, err
+	}
+
+	resp = &types.Result{
 		Msg: result.Msg,
 	}
 	return resp, err

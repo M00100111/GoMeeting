@@ -24,10 +24,8 @@ func NewPinguserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pinguser
 	}
 }
 
-func (l *PinguserLogic) Pinguser(req *types.PingReq) (resp *types.PingResp, err error) {
-	result, err := l.svcCtx.User.Ping(l.ctx, &user.PingReq{Msg: req.Msg})
-	resp = &types.PingResp{
-		Msg: result.Msg,
-	}
-	return resp, err
+func (l *PinguserLogic) Pinguser(req *types.PingReq) (resp *types.Result, err error) {
+	// todo: add your logic here and delete this line
+	result, err := l.svcCtx.UserRpc.Ping(l.ctx, &user.PingReq{Msg: req.Msg})
+	return types.NewSuccessMessageResult(result.Msg + "!!!"), nil
 }

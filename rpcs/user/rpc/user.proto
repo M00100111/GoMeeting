@@ -27,6 +27,7 @@ message SignUpReq{
 }
 message SignUpResp{
   string msg = 1;
+  uint64 id = 2;
 }
 
 //登录功能请求与响应结构体

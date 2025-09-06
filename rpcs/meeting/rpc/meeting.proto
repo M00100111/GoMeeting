@@ -1,0 +1,53 @@
+syntax = "proto3";  //指定协议版本
+package meeting; //默认包名,用于proto文件
+option go_package = "./meeting"; //默认包名,用于生成的代码
+
+//会议服务
+service Meeting{
+  rpc Ping(PingReq) returns (Result);
+  rpc CreateMeeting(CreateMeetingReq) returns (Result);
+  rpc StartMeeting(StartMeetingReq) returns (Result);
+  rpc EndMeeting(EndMeetingReq) returns (Result);
+  rpc AppointmentMeeting(AppointmentMeetingReq) returns (Result);
+//  rpc CancelMeeting(CancelMeetingReq) returns (Result);
+//  rpc UpdateMeeting(UpdateMeetingReq) returns (Result);
+}
+//用户注册时创建对应的会议记录与会议成员记录：分布式事务+本地事务
+//修改会议状态:会议开始与结束
+//修改会议开始时间
+//修改会议加入方式与密码
+
+//不重要的功能
+//查询已结束的会议
+//查询待开始的会议
+//拉黑用户
+//用户修改会议id与会议名称
+
+message Result{
+  uint32 status = 1;
+  string msg = 2;
+}
+
+message PingReq{
+  string msg = 1;
+}
+
+message CreateMeetingReq{
+  uint64 userId = 1;
+  string username = 2;
+}
+
+message StartMeetingReq{
+  string meetingId = 3;
+}
+
+message EndMeetingReq{
+  string meetingId = 1;
+}
+
+message AppointmentMeetingReq{
+  string meetingId = 1;
+  int64 startTime = 2;
+}
+
+

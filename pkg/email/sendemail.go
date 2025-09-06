@@ -18,8 +18,8 @@ func SendEmail(targetEmail string, content string) error {
 	em.From = fmt.Sprintf("GoMeeting <%s>", emailAddr)
 	em.To = []string{targetEmail}
 	em.Subject = "GoMeeting 验证码"
-	//em.Text = []byte(fmt.Sprintf("您的验证码是：%s，有效期5分钟。", content))
-	em.Text = []byte(content)
+	em.Text = []byte(fmt.Sprintf("您的验证码是：%s，有效期5分钟。", content))
+	//em.Text = []byte(content)
 
 	// 使用QQ邮箱587端口 - 最常用的配置
 	auth := smtp.PlainAuth("", emailAddr, smtpKey, smtpServer)

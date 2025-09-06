@@ -10,5 +10,6 @@ type Config struct {
 	rest.RestConf
 	Redis redis.RedisConf
 
-	UserRpc zrpc.RpcClientConf
+	UserRpc    zrpc.RpcClientConf
+	MeetingRpc zrpc.RpcClientConf
 }

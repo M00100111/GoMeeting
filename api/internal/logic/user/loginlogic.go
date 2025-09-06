@@ -26,18 +26,18 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 	}
 }
 
-func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
-	result, err := l.svcCtx.Login(l.ctx, &user.LoginReq{
+func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.Result, err error) {
+	result, err := l.svcCtx.UserRpc.Login(l.ctx, &user.LoginReq{
 		Email:    req.Email,
 		Captcha:  req.Captcha,
 		Password: req.Password,
 	})
 	uid, _ := strconv.Atoi(result.UserId)
-	resp = &types.LoginResp{
+
+	return types.NewSuccessResult(&types.LoginResp{
 		Msg:    result.Msg,
 		UserId: int64(uid),
 		Token:  result.Token,
 		Expire: result.Expire,
-	}
-	return resp, err
+	}), err
 }

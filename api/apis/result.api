@@ -1,0 +1,13 @@
+syntax= "v1"
+
+type(
+    Result {
+        Code int32  `json:"code"`
+        Msg string  `json:"msg"`
+        Data interface{} `json:"data"`
+    }
+
+    PingReq{
+        Msg string `json:"msg"`
+    }
+)
