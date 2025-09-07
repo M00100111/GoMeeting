@@ -1,7 +1,7 @@
 package server
 
 import (
-	"GoMeeting/ws/internal/message"
+	"GoMeeting/rpcs/ws/internal/message"
 )
 
 type Route struct {

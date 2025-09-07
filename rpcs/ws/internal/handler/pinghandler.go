@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"GoMeeting/ws/internal/message"
-	"GoMeeting/ws/internal/server"
-	"GoMeeting/ws/internal/svc"
+	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/rpcs/ws/internal/server"
+	"GoMeeting/rpcs/ws/internal/svc"
 )
 
 func PingHandler(svcCtx *svc.ServiceContext) server.WsHandlerFunc {

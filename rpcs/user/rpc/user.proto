@@ -14,7 +14,8 @@ message PingReq{
   string msg = 1;
 }
 message PingResp{
-  string msg = 1;
+  int32 code = 1;
+  string msg = 2;
 }
 
 message SignUpReq{
@@ -26,8 +27,11 @@ message SignUpReq{
   string avatar = 6;
 }
 message SignUpResp{
-  string msg = 1;
-  uint64 id = 2;
+  int32 code = 1;
+  string msg = 2;
+
+  uint64 id = 3;
+  string meetingId = 4;
 }
 
 //登录功能请求与响应结构体
@@ -36,10 +40,11 @@ message LoginReq{
   string captcha = 2;
   string password = 3;
 }
-
 message LoginResp{
-  string token = 1;
-  int64 expire = 2;
-  string userId = 3;
-  string msg = 4;
+  int32 code = 1;
+  string msg = 2;
+
+  string token = 3;
+  int64 expire = 4;
+  string userId = 5;
 }

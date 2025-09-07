@@ -201,7 +201,7 @@ func (m *defaultMeetingInfoModel) CreateMeeting(ctx context.Context, data *Meeti
 			//根据会议id查询会议信息记录获取会议主键
 			var meeting_index uint64
 			query = fmt.Sprintf("SELECT %s FROM %s WHERE meeting_id = ? LIMIT 1", meetingInfoFieldNames[0], m.table)
-			session.QueryRowCtx(ctx, meeting_index, query, data.MeetingId)
+			session.QueryRowCtx(ctx, &meeting_index, query, data.MeetingId)
 
 			// 创建会议成员信息记录
 			meetingMember := &MeetingMember{

@@ -1,7 +1,7 @@
 package svc
 
 import (
-	"GoMeeting/ws/internal/config"
+	"GoMeeting/rpcs/ws/internal/config"
 )
 
 type ServiceContext struct {

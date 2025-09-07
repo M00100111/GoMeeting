@@ -2,8 +2,8 @@ package server
 
 import (
 	"GoMeeting/pkg/ctxdata"
-	"GoMeeting/ws/internal/message"
-	"GoMeeting/ws/internal/svc"
+	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/rpcs/ws/internal/svc"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"

@@ -4,7 +4,9 @@ import (
 	"GoMeeting/pkg/captcha"
 	"GoMeeting/pkg/ctxdata"
 	"GoMeeting/pkg/email"
+	code "GoMeeting/pkg/result"
 	"context"
+	"runtime/debug"
 	"time"
 
 	"GoMeeting/api/internal/svc"
@@ -35,16 +37,17 @@ func (l *GenerateCaptchaLogic) GenerateCaptcha(req *types.CaptchaReq) (resp *typ
 	key := ctxdata.CAPTCHA_KEY_PREFIX + req.Email
 
 	err = email.SendEmail(req.Email, value)
+	//业务错误
 	if err != nil {
-		logx.Errorf("发送验证码到邮箱 %v 失败: %v", req.Email, err)
-		return types.NewErrorResultf("发送验证码到邮箱 %v 失败: %v", req.Email, err), err
+		l.Logger.Errorf("发送验证码到邮箱 %v 失败: %v, stack: %s", req.Email, err, debug.Stack())
+		return types.NewErrorResultWithCodef(code.CaptchaSendFailCode, req.Email), nil
 	}
 
 	// 设置单个键值对并设置过期时间（5分钟）
 	err = l.svcCtx.Redis.Setex(key, value, int(CAPTCHA_EXPIRE_TIME.Seconds()))
 	if err != nil {
-		logx.Errorf("设置邮箱 %v 的验证码到redis中失败: %v", req.Email, err)
-		return types.NewErrorResultf("设置邮箱 %v 的验证码到redis中失败: %v", req.Email, err), err
+		l.Logger.Errorf("设置邮箱 %v 的验证码到redis中失败: %v, stack: %s", req.Email, err, debug.Stack())
+		return types.NewErrorResultWithCodef(code.ErrRedisOpCode, req.Email), nil
 	}
 
 	return types.NewSuccessMessageResult("已发送验证码到邮箱" + req.Email), nil

@@ -24,7 +24,7 @@ service Meeting{
 //用户修改会议id与会议名称
 
 message Result{
-  uint32 status = 1;
+  uint32 code = 1;
   string msg = 2;
 }
 
@@ -35,6 +35,7 @@ message PingReq{
 message CreateMeetingReq{
   uint64 userId = 1;
   string username = 2;
+  string meetingId = 3;
 }
 
 message StartMeetingReq{

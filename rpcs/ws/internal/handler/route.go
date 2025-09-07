@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"GoMeeting/ws/internal/server"
-	"GoMeeting/ws/internal/svc"
+	"GoMeeting/rpcs/ws/internal/server"
+	"GoMeeting/rpcs/ws/internal/svc"
 )
 
 func RegisterHandlers(s *server.WsServer, svc *svc.ServiceContext) {
