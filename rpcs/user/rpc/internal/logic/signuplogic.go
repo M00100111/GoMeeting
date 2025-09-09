@@ -139,6 +139,6 @@ func (l *SignUpLogic) SignUp(in *user.SignUpReq) (*user.SignUpResp, error) {
 	return &user.SignUpResp{
 		Code:      code.SUCCESSCode,
 		Id:        u.Id,
-		MeetingId: strconv.Itoa(int(u.UserId)),
+		MeetingId: u.UserId,
 	}, nil
 }

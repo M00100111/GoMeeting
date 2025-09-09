@@ -17,6 +17,7 @@ type (
 	AppointmentMeetingReq = meeting.AppointmentMeetingReq
 	CreateMeetingReq      = meeting.CreateMeetingReq
 	EndMeetingReq         = meeting.EndMeetingReq
+	JoinMeetingReq        = meeting.JoinMeetingReq
 	PingReq               = meeting.PingReq
 	Result                = meeting.Result
 	StartMeetingReq       = meeting.StartMeetingReq
@@ -27,6 +28,7 @@ type (
 		StartMeeting(ctx context.Context, in *StartMeetingReq, opts ...grpc.CallOption) (*Result, error)
 		EndMeeting(ctx context.Context, in *EndMeetingReq, opts ...grpc.CallOption) (*Result, error)
 		AppointmentMeeting(ctx context.Context, in *AppointmentMeetingReq, opts ...grpc.CallOption) (*Result, error)
+		JoinMeeting(ctx context.Context, in *JoinMeetingReq, opts ...grpc.CallOption) (*Result, error)
 	}
 
 	defaultMeeting struct {
@@ -63,4 +65,9 @@ func (m *defaultMeeting) EndMeeting(ctx context.Context, in *EndMeetingReq, opts
 func (m *defaultMeeting) AppointmentMeeting(ctx context.Context, in *AppointmentMeetingReq, opts ...grpc.CallOption) (*Result, error) {
 	client := meeting.NewMeetingClient(m.cli.Conn())
 	return client.AppointmentMeeting(ctx, in, opts...)
+}
+
+func (m *defaultMeeting) JoinMeeting(ctx context.Context, in *JoinMeetingReq, opts ...grpc.CallOption) (*Result, error) {
+	client := meeting.NewMeetingClient(m.cli.Conn())
+	return client.JoinMeeting(ctx, in, opts...)
 }

@@ -6,6 +6,7 @@ package handler
 import (
 	"net/http"
 
+	meeting "GoMeeting/api/internal/handler/meeting"
 	tool "GoMeeting/api/internal/handler/tool"
 	user "GoMeeting/api/internal/handler/user"
 	"GoMeeting/api/internal/svc"
@@ -14,6 +15,36 @@ import (
 )
 
 func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/pingmeeting",
+				Handler: meeting.PingMeetingHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/meeting"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.JwtAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/endmeeting",
+					Handler: meeting.EndMeetingHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/startmeeting",
+					Handler: meeting.StartMeetingHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/meeting"),
+	)
+
 	server.AddRoutes(
 		[]rest.Route{
 			{

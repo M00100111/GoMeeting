@@ -25,6 +25,7 @@ func NewAppointmentMeetingLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 
 func (l *AppointmentMeetingLogic) AppointmentMeeting(in *meeting.AppointmentMeetingReq) (*meeting.Result, error) {
 	// todo: add your logic here and delete this line
-
+	//预定开启时间
+	//通知会议成员
 	return &meeting.Result{}, nil
 }

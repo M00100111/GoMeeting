@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Ping_FullMethodName   = "/user.User/Ping"
-	User_SignUp_FullMethodName = "/user.User/SignUp"
-	User_Login_FullMethodName  = "/user.User/Login"
+	User_Ping_FullMethodName             = "/user.User/Ping"
+	User_SignUp_FullMethodName           = "/user.User/SignUp"
+	User_Login_FullMethodName            = "/user.User/Login"
+	User_GetIndexByUserId_FullMethodName = "/user.User/GetIndexByUserId"
 )
 
 // UserClient is the client API for User service.
@@ -34,6 +35,7 @@ type UserClient interface {
 	Ping(ctx context.Context, in *PingReq, opts ...grpc.CallOption) (*PingResp, error)
 	SignUp(ctx context.Context, in *SignUpReq, opts ...grpc.CallOption) (*SignUpResp, error)
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
+	GetIndexByUserId(ctx context.Context, in *GetIndexByUserIdReq, opts ...grpc.CallOption) (*GetIndexByUserIdResp, error)
 }
 
 type userClient struct {
@@ -74,6 +76,16 @@ func (c *userClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallO
 	return out, nil
 }
 
+func (c *userClient) GetIndexByUserId(ctx context.Context, in *GetIndexByUserIdReq, opts ...grpc.CallOption) (*GetIndexByUserIdResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetIndexByUserIdResp)
+	err := c.cc.Invoke(ctx, User_GetIndexByUserId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -84,6 +96,7 @@ type UserServer interface {
 	Ping(context.Context, *PingReq) (*PingResp, error)
 	SignUp(context.Context, *SignUpReq) (*SignUpResp, error)
 	Login(context.Context, *LoginReq) (*LoginResp, error)
+	GetIndexByUserId(context.Context, *GetIndexByUserIdReq) (*GetIndexByUserIdResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -102,6 +115,9 @@ func (UnimplementedUserServer) SignUp(context.Context, *SignUpReq) (*SignUpResp,
 }
 func (UnimplementedUserServer) Login(context.Context, *LoginReq) (*LoginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedUserServer) GetIndexByUserId(context.Context, *GetIndexByUserIdReq) (*GetIndexByUserIdResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetIndexByUserId not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -178,6 +194,24 @@ func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetIndexByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetIndexByUserIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetIndexByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetIndexByUserId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetIndexByUserId(ctx, req.(*GetIndexByUserIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -196,6 +230,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _User_Login_Handler,
+		},
+		{
+			MethodName: "GetIndexByUserId",
+			Handler:    _User_GetIndexByUserId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

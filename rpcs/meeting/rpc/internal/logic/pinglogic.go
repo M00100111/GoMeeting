@@ -1,6 +1,7 @@
 package logic
 
 import (
+	code "GoMeeting/pkg/result"
 	"context"
 
 	"GoMeeting/rpcs/meeting/rpc/internal/svc"
@@ -24,7 +25,8 @@ func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
 }
 
 func (l *PingLogic) Ping(in *meeting.PingReq) (*meeting.Result, error) {
-	// todo: add your logic here and delete this line
-
-	return &meeting.Result{}, nil
+	return &meeting.Result{
+		Code: code.SUCCESSCode,
+		Msg:  in.Msg + "!!!",
+	}, nil
 }

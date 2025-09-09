@@ -47,3 +47,8 @@ func (s *MeetingServer) AppointmentMeeting(ctx context.Context, in *meeting.Appo
 	l := logic.NewAppointmentMeetingLogic(ctx, s.svcCtx)
 	return l.AppointmentMeeting(in)
 }
+
+func (s *MeetingServer) JoinMeeting(ctx context.Context, in *meeting.JoinMeetingReq) (*meeting.Result, error) {
+	l := logic.NewJoinMeetingLogic(ctx, s.svcCtx)
+	return l.JoinMeeting(in)
+}

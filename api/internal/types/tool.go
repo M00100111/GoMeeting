@@ -8,6 +8,6 @@ type CaptchaReq struct {
 	Expire int64  `json:"expire"`
 }
 
-type CaptchaResp struct {
+type PingReq struct {
 	Msg string `json:"msg"`
 }

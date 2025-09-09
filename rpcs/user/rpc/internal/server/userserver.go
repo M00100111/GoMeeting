@@ -38,3 +38,8 @@ func (s *UserServer) Login(ctx context.Context, in *user.LoginReq) (*user.LoginR
 	l := logic.NewLoginLogic(ctx, s.svcCtx)
 	return l.Login(in)
 }
+
+func (s *UserServer) GetIndexByUserId(ctx context.Context, in *user.GetIndexByUserIdReq) (*user.GetIndexByUserIdResp, error) {
+	l := logic.NewGetIndexByUserIdLogic(ctx, s.svcCtx)
+	return l.GetIndexByUserId(in)
+}

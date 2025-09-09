@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -65,7 +66,7 @@ func (s *WsServer) BuildWsConn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//将当前客户端的http连接升级为websocket连接
-	conn := NewWsConn(s, w, r, uid)
+	conn := NewWsConn(s, w, r, strconv.FormatUint(uid, 10))
 	if conn == nil {
 		return
 	}

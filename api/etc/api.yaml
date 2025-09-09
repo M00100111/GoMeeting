@@ -3,7 +3,7 @@ Host: 0.0.0.0
 Port: 8080
 
 JwtAuth:
-  AccessSecret: uOvKLmVfztaXGpNYd4Z0I1SiT7MweJhl
+  AccessSecret: meeting
   AccessExpire: 86400
 
 Redis:

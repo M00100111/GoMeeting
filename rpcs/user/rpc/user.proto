@@ -8,6 +8,7 @@ service User{
   rpc Ping(PingReq) returns (PingResp);
   rpc SignUp(SignUpReq) returns (SignUpResp);
   rpc Login(LoginReq) returns (LoginResp);
+  rpc GetIndexByUserId(GetIndexByUserIdReq) returns (GetIndexByUserIdResp);
 }
 
 message PingReq{
@@ -31,7 +32,7 @@ message SignUpResp{
   string msg = 2;
 
   uint64 id = 3;
-  string meetingId = 4;
+  uint64 meetingId = 4;
 }
 
 //登录功能请求与响应结构体
@@ -47,4 +48,14 @@ message LoginResp{
   string token = 3;
   int64 expire = 4;
   string userId = 5;
+}
+
+message GetIndexByUserIdReq{
+  uint64 userId = 1;
+}
+message GetIndexByUserIdResp{
+  int32 code = 1;
+  string msg = 2;
+
+  uint64 index = 3;
 }

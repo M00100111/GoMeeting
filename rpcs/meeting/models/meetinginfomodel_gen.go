@@ -33,7 +33,7 @@ type (
 	meetingInfoModel interface {
 		Insert(ctx context.Context, data *MeetingInfo) (sql.Result, error)
 		FindOne(ctx context.Context, id uint64) (*MeetingInfo, error)
-		FindOneByMeetingId(ctx context.Context, meetingId string) (*MeetingInfo, error)
+		FindOneByMeetingId(ctx context.Context, meetingId uint64) (*MeetingInfo, error)
 		FindOneByUserId(ctx context.Context, userId uint64) (*MeetingInfo, error)
 		Update(ctx context.Context, data *MeetingInfo) error
 		Delete(ctx context.Context, id uint64) error
@@ -48,7 +48,7 @@ type (
 
 	MeetingInfo struct {
 		Id              uint64       `db:"id"`               // 主键
-		MeetingId       string       `db:"meeting_id"`       // 会议号
+		MeetingId       uint64       `db:"meeting_id"`       // 会议号
 		MeetingName     string       `db:"meeting_name"`     // 会议名称
 		UserId          uint64       `db:"user_id"`          // 用户主键
 		Status          uint64       `db:"status"`           // 状态：0-空闲，1-进行中
@@ -100,7 +100,7 @@ func (m *defaultMeetingInfoModel) FindOne(ctx context.Context, id uint64) (*Meet
 	}
 }
 
-func (m *defaultMeetingInfoModel) FindOneByMeetingId(ctx context.Context, meetingId string) (*MeetingInfo, error) {
+func (m *defaultMeetingInfoModel) FindOneByMeetingId(ctx context.Context, meetingId uint64) (*MeetingInfo, error) {
 	meetingInfoMeetingIdKey := fmt.Sprintf("%s%v", cacheMeetingInfoMeetingIdPrefix, meetingId)
 	var resp MeetingInfo
 	err := m.QueryRowIndexCtx(ctx, &resp, meetingInfoMeetingIdKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v any) (i any, e error) {
@@ -179,7 +179,6 @@ func (m *defaultMeetingInfoModel) queryPrimary(ctx context.Context, conn sqlx.Sq
 func (m *defaultMeetingInfoModel) tableName() string {
 	return m.table
 }
-
 func (m *defaultMeetingInfoModel) CreateMeeting(ctx context.Context, data *MeetingInfo) error{
 	meetingInfoIdKey := fmt.Sprintf("%s%v", cacheMeetingInfoIdPrefix, data.Id)
 	meetingInfoMeetingIdKey := fmt.Sprintf("%s%v", cacheMeetingInfoMeetingIdPrefix, data.MeetingId)

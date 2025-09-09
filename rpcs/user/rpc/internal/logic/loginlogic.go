@@ -106,7 +106,7 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginResp, error) {
 
 	//生成token并返回
 	now := time.Now().Unix()
-	token, err := ctxdata.GetJwtToken(l.svcCtx.Config.Jwt.AccessSecret, now, l.svcCtx.Config.Jwt.AccessExpire, strconv.FormatUint(u.UserId, 10))
+	token, err := ctxdata.GetJwtToken(l.svcCtx.Config.Jwt.AccessSecret, now, l.svcCtx.Config.Jwt.AccessExpire, u.UserId)
 	if err != nil {
 		l.Logger.Errorf("生成token失败: %v, stack: %s", err, debug.Stack())
 		return &user.LoginResp{

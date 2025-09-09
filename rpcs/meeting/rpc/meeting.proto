@@ -9,6 +9,7 @@ service Meeting{
   rpc StartMeeting(StartMeetingReq) returns (Result);
   rpc EndMeeting(EndMeetingReq) returns (Result);
   rpc AppointmentMeeting(AppointmentMeetingReq) returns (Result);
+  rpc JoinMeeting(JoinMeetingReq) returns (Result);
 //  rpc CancelMeeting(CancelMeetingReq) returns (Result);
 //  rpc UpdateMeeting(UpdateMeetingReq) returns (Result);
 }
@@ -24,7 +25,7 @@ service Meeting{
 //用户修改会议id与会议名称
 
 message Result{
-  uint32 code = 1;
+  int32 code = 1;
   string msg = 2;
 }
 
@@ -35,19 +36,30 @@ message PingReq{
 message CreateMeetingReq{
   uint64 userId = 1;
   string username = 2;
-  string meetingId = 3;
+  uint64 meetingId = 3;
 }
 
 message StartMeetingReq{
-  string meetingId = 3;
+  uint64 userIndex = 1;
+  uint64 meetingId = 2;
+  string meetingName = 3;
+  uint64 joinType = 4;
+  string password = 5;
+}
+
+message JoinMeetingReq{
+  uint64 userIndex = 1;
+  uint64 meetingId = 2;
+  string password = 5;
 }
 
 message EndMeetingReq{
-  string meetingId = 1;
+  uint64 userIndex = 1;
+  uint64 meetingId = 2;
 }
 
 message AppointmentMeetingReq{
-  string meetingId = 1;
+  uint64 meetingId = 1;
   int64 startTime = 2;
 }
 

@@ -58,27 +58,42 @@ const (
 )
 
 const (
-	ParamErrorCode = 400 //参数错误
-	ErrDbOpCode    = 1001
-	ErrRedisOpCode = 1002
+	ParamErrorCode = 400
+)
+
+const ( //参数错误
+	ErrDbOpCode = 1001 + iota
+	ErrRedisOpCode
+	ErrRecordNotExistCode
+	TokenErrorCode
+	TokenExpireCode
+	TokenGenerateErrorCode
 )
 
 const (
-	UserRegisterFailCode  = 10000
-	EmailExistCode        = 10001
-	UserExistCode         = 10002
-	UserNotExistCode      = 10003
-	UserLoginFailCode     = 10004
-	CaptchaErrorCode      = 10005
-	CaptchaExpireCode     = 10006
-	CaptchaSendFailCode   = 10007
-	UserPasswordErrorCode = 10008
+	UserRegisterFailCode = 10000 + iota
+	EmailExistCode
+	UserExistCode
+	UserNotExistCode
+	UserLoginFailCode
+	CaptchaErrorCode
+	CaptchaExpireCode
+	CaptchaSendFailCode
+	UserPasswordErrorCode
+	UserNoPermissionCode
 )
 
+// 会议相关错误码
 const (
-	TokenErrorCode         = 1003
-	TokenExpireCode        = 1004
-	TokenGenerateErrorCode = 1005
+	MeetingUserInOtherMeetingCode = 20000 + iota
+	MeetingUserNotAllowedCode
+	MeetingJoinCodeErrorCode
+	MeetingNotExistCode
+	MeetingAlreadyStartedCode
+	MeetingAlreadyEndedCode
+	MeetingStartFailCode
+	MeetingNotStartedCode
+	MeetingEndFailCode
 )
 
 // 通用状态对象
@@ -89,12 +104,15 @@ var (
 )
 
 var (
-	ErrDbOp    = RegisterCode(ErrDbOpCode, "数据库操作异常")
-	ErrRedisOp = RegisterCode(ErrRedisOpCode, "Redis操作异常")
+	ParamError         = RegisterCode(ParamErrorCode, "参数错误")
+	ErrDbOp            = RegisterCode(ErrDbOpCode, "数据库操作异常")
+	ErrRedisOp         = RegisterCode(ErrRedisOpCode, "Redis操作异常")
+	ErrRecordNotExist  = RegisterCode(ErrRecordNotExistCode, "记录不存在")
+	TokenError         = RegisterCode(TokenErrorCode, "token错误")
+	TokenGenerateError = RegisterCode(TokenGenerateErrorCode, "token生成错误")
 )
 
 var (
-	ParamError        = RegisterCode(ParamErrorCode, "参数错误")
 	UserRegisterFail  = RegisterCode(UserRegisterFailCode, "用户注册失败")
 	EmailExist        = RegisterCode(EmailExistCode, "邮箱已存在")
 	UserExist         = RegisterCode(UserExistCode, "用户已存在")
@@ -102,11 +120,22 @@ var (
 	UserPasswordError = RegisterCode(UserPasswordErrorCode, "用户密码错误")
 	UserLoginFail     = RegisterCode(UserLoginFailCode, "用户登录失败")
 
+	UserNoPermission = RegisterCode(UserNoPermissionCode, "用户无此权限")
+
 	UserCaptchaFail     = RegisterCode(CaptchaErrorCode, "验证码错误")
 	UserCaptchaExpire   = RegisterCode(CaptchaExpireCode, "验证码已过期")
 	UserCaptchaSendFail = RegisterCode(CaptchaSendFailCode, "验证码发送失败")
 )
+
+// 会议相关错误信息
 var (
-	TokenError         = RegisterCode(TokenErrorCode, "token错误")
-	TokenGenerateError = RegisterCode(TokenGenerateErrorCode, "token生成错误")
+	MeetingUserInOtherMeeting = RegisterCode(MeetingUserInOtherMeetingCode, "用户已加入其他会议")
+	MeetingUserNotAllowed     = RegisterCode(MeetingUserNotAllowedCode, "用户不被允许加入会议")
+	MeetingJoinCodeError      = RegisterCode(MeetingJoinCodeErrorCode, "入会码错误")
+	MeetingNotExist           = RegisterCode(MeetingNotExistCode, "会议不存在")
+	MeetingAlreadyStarted     = RegisterCode(MeetingAlreadyStartedCode, "会议已开始")
+	MeetingNotStarted         = RegisterCode(MeetingNotStartedCode, "会议未开始")
+	MeetingAlreadyEnded       = RegisterCode(MeetingAlreadyEndedCode, "会议已结束")
+	MeetingStartFail          = RegisterCode(MeetingStartFailCode, "会议开启失败")
+	MeetingEndFail            = RegisterCode(MeetingEndFailCode, "结束会议失败")
 )

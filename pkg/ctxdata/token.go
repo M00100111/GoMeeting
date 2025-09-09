@@ -3,11 +3,12 @@ package ctxdata
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
+	"strconv"
 )
 
 const Identify = "meeting"
 
-func GetJwtToken(secretKey string, iat, seconds int64, uid string) (string, error) {
+func GetJwtToken(secretKey string, iat, seconds int64, uid uint64) (string, error) {
 	claims := make(jwt.MapClaims)
 	claims["iat"] = iat
 	claims["exp"] = iat + seconds
@@ -31,25 +32,38 @@ func parseJwtToken(tokenString string, secretKey string) (*jwt.Token, error) {
 }
 
 // GetUidFromToken 从token中提取用户ID
-func GetUidFromToken(tokenString string, secretKey string) (string, error) {
+func GetUidFromToken(tokenString string, secretKey string) (uint64, error) {
 	token, err := parseJwtToken(tokenString, secretKey)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	// 验证token是否有效
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// 提取用户ID
 		if uid, exists := claims[Identify]; exists {
-			if uidStr, ok := uid.(string); ok {
-				return uidStr, nil
+			// 处理多种可能的类型
+			switch v := uid.(type) {
+			case float64:
+				return uint64(v), nil
+			case string:
+				// 如果是字符串，尝试转换为uint64
+				if parsed, err := strconv.ParseUint(v, 10, 64); err == nil {
+					return parsed, nil
+				}
+				return 0, fmt.Errorf("user id string cannot be parsed as uint64")
+			case uint64:
+				return v, nil
+			case int64:
+				return uint64(v), nil
+			default:
+				return 0, fmt.Errorf("unexpected user id type: %T", uid)
 			}
-			return "", fmt.Errorf("user id is not a string")
 		}
-		return "", fmt.Errorf("user id not found in token")
+		return 0, fmt.Errorf("user id not found in token")
 	}
 
-	return "", fmt.Errorf("invalid token claims")
+	return 0, fmt.Errorf("invalid token claims")
 }
 
 // ValidateToken 验证token是否有效

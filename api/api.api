@@ -3,6 +3,7 @@ syntax = "v1"
 import (
 	"apis/result.api"
 	"apis/user.api"
+	"apis/meeting.api"
 	"apis/tool.api"
 )
 
@@ -21,6 +22,28 @@ service api {
 	@doc "用户登录"
 	@handler login
 	post /login (LoginReq) returns (Result)
+}
+
+@server (
+	prefix: meeting
+	group:  meeting
+)
+service api {
+	@handler pingMeeting
+	get /pingmeeting (PingReq) returns (Result)
+}
+
+@server (
+	prefix:     meeting
+	group:      meeting
+	middleware: JwtAuth
+)
+service api {
+	@handler startMeeting
+	post /startmeeting (StartMeetingReq) returns (Result)
+
+	@handler endMeeting
+	post /endmeeting (EndMeetingReq) returns (Result)
 }
 
 @server (
