@@ -44,6 +44,12 @@ service api {
 
 	@handler endMeeting
 	post /endmeeting (EndMeetingReq) returns (Result)
+
+	@handler joinMeeting
+	post /joinmeeting (JoinMeetingReq) returns (Result)
+
+	@handler leaveMeeting
+	post /leavemeeting (LeaveMeetingReq) returns (Result)
 }
 
 @server (

@@ -52,3 +52,8 @@ func (s *MeetingServer) JoinMeeting(ctx context.Context, in *meeting.JoinMeeting
 	l := logic.NewJoinMeetingLogic(ctx, s.svcCtx)
 	return l.JoinMeeting(in)
 }
+
+func (s *MeetingServer) LeaveMeeting(ctx context.Context, in *meeting.LeaveMeetingReq) (*meeting.Result, error) {
+	l := logic.NewLeaveMeetingLogic(ctx, s.svcCtx)
+	return l.LeaveMeeting(in)
+}

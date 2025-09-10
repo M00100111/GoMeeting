@@ -21,7 +21,7 @@ services:
     environment:
       - TZ=${TZ} # 设置时区
       - ALLOW_NONE_AUTHENTICATION=yes # 允许没有密码的访问
-      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379 # 配置etcd的监听地址
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379,http://127.0.0.1:2379 # 配置etcd的监听地址,支持容器内和宿主机
       - ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379 # 配置etcd的广播地址
       - ETCD_NAME=etcd # 配置etcd节点的名称(用于集群)
 

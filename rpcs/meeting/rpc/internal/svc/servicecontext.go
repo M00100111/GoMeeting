@@ -9,7 +9,7 @@ import (
 
 type ServiceContext struct {
 	Config config.Config
-	*redis.Redis
+	Redis  *redis.Redis
 	models.MeetingInfoModel
 	models.MeetingMemberModel
 }

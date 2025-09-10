@@ -94,6 +94,8 @@ const (
 	MeetingStartFailCode
 	MeetingNotStartedCode
 	MeetingEndFailCode
+	MeetingAlreadyInCode
+	MeetingUserNotInMeetingCode
 )
 
 // 通用状态对象
@@ -138,4 +140,6 @@ var (
 	MeetingAlreadyEnded       = RegisterCode(MeetingAlreadyEndedCode, "会议已结束")
 	MeetingStartFail          = RegisterCode(MeetingStartFailCode, "会议开启失败")
 	MeetingEndFail            = RegisterCode(MeetingEndFailCode, "结束会议失败")
+	MeetingAlreadyIn          = RegisterCode(MeetingAlreadyInCode, "已在会议中")
+	MeetingUserNotInMeeting   = RegisterCode(MeetingUserNotInMeetingCode, "用户不在会议中")
 )

@@ -29,6 +29,8 @@ func NewStartMeetingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Star
 }
 
 func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.Result, error) {
+	//开启会议时将等待室的成员入会(待实现)
+
 	//根据会议号查询会议信息主键
 	meetingInfo, err := l.svcCtx.MeetingInfoModel.FindOneByMeetingId(l.ctx, in.MeetingId)
 	//数据库操作出错
@@ -68,7 +70,7 @@ func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.
 	//当会议已开始但用户为会议主持人则跳转到申请入会请求，上面已鉴权
 	if meetingInfo.Status == 1 {
 		//申请入会,修改当前人的入会信息
-		err = joinMeeting(l, in.MeetingId, in.UserIndex, in.Password)
+		err = joinMeeting(l, in.MeetingId, in.UserIndex, in.UserId, in.Password)
 		if err != nil {
 			return &meeting.Result{
 				Code: code.SYS_ERRORCode,
@@ -136,7 +138,7 @@ func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.
 	}
 
 	//申请入会,修改当前人的入会信息
-	err = joinMeeting(l, in.MeetingId, in.UserIndex, in.Password)
+	err = joinMeeting(l, in.MeetingId, in.UserIndex, in.UserId, in.Password)
 	if err != nil {
 		return &meeting.Result{
 			Code: code.SYS_ERRORCode,
@@ -149,10 +151,11 @@ func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.
 }
 
 // 调用同一个服务内的 JoinMeeting 方法
-func joinMeeting(l *StartMeetingLogic, meetingId, userIndex uint64, meetingPassword string) error {
+func joinMeeting(l *StartMeetingLogic, meetingId, userIndex, userId uint64, meetingPassword string) error {
 	// 调用同一个服务内的 JoinMeeting 方法
 	joinReq := &meeting.JoinMeetingReq{
 		UserIndex: userIndex,
+		UserId:    userId,
 		MeetingId: meetingId,
 		Password:  meetingPassword,
 	}

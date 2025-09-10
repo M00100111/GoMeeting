@@ -117,4 +117,6 @@ func (c *WsConn) CloseWsConn() error {
 		close(c.Done) // 关闭通道
 	}
 	return c.Conn.Close() // 关闭websocket连接
+
+	//在会人员自动退出会议
 }

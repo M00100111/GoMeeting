@@ -37,6 +37,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodPost,
+					Path:    "/joinmeeting",
+					Handler: meeting.JoinMeetingHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/leavemeeting",
+					Handler: meeting.LeaveMeetingHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/startmeeting",
 					Handler: meeting.StartMeetingHandler(serverCtx),
 				},

@@ -8,6 +8,20 @@ type EndMeetingReq struct {
 	MeetingId uint64 `json:"meetingId"`
 }
 
+type JoinMeetingReq struct {
+	UserId       uint64 `json:"-"` // 服务端填充，不在客户端 JSON 中
+	MeetingId    uint64 `json:"meetingId"`
+	Password     string `json:"password"`
+	MicStatus    uint64 `json:"micStatus"`
+	CameraStatus uint64 `json:"cameraStatus"`
+	ScreenStatus uint64 `json:"screenStatus"`
+}
+
+type LeaveMeetingReq struct {
+	UserId    uint64 `json:"-"`
+	MeetingId uint64 `json:"meetingId"`
+}
+
 type StartMeetingReq struct {
 	UserId      uint64 `json:"-"` // 服务端填充，不在客户端 JSON 中
 	MeetingId   uint64 `json:"meetingId"`

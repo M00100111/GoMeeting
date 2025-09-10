@@ -1,11 +1,16 @@
 package logic
 
 import (
+	"GoMeeting/pkg/ctxdata"
 	code "GoMeeting/pkg/result"
+	"GoMeeting/pkg/structs"
 	"GoMeeting/rpcs/meeting/models"
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
+	"strconv"
 	"time"
 
 	"GoMeeting/rpcs/meeting/rpc/internal/svc"
@@ -56,6 +61,9 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 				Code: code.MeetingAlreadyEndedCode,
 			}, nil
 		}
+		return &meeting.Result{
+			Code: code.MeetingNotStartedCode,
+		}, nil
 	}
 	//判断加入方式
 	//验证密码
@@ -109,6 +117,51 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 			}, nil
 		}
 	}
+
+	// 将会议室成员id和状态信息分别添加到Redis
+
+	// 存储成员Index到 Redis Hash (成员ID -> 会议ID)
+	err = l.svcCtx.Redis.HsetCtx(l.ctx, ctxdata.OnMeetingUserPrefix, strconv.FormatUint(in.UserId, 10), strconv.FormatUint(in.MeetingId, 10))
+	if err != nil {
+		l.Logger.Errorf("Failed to store member ID in RedisHash: %v", err)
+		return &meeting.Result{
+			Code: code.ErrRedisOpCode,
+		}, nil
+	}
+
+	// 存储成员Index到 Redis List
+	memberSetKey := fmt.Sprintf(ctxdata.MeetingMemberPrefix, in.MeetingId)
+	val, err := l.svcCtx.Redis.SaddCtx(l.ctx, memberSetKey, in.UserId)
+	if err != nil {
+		l.Logger.Errorf("Failed to store member ID in RedisList: %v", err)
+		return &meeting.Result{
+			Code: code.ErrRedisOpCode,
+		}, nil
+	}
+	//val为受影响的元素
+	if val == 0 {
+		return &meeting.Result{
+			Code: code.MeetingAlreadyInCode,
+		}, nil
+	}
+
+	// 存储成员状态到 Redis Hash
+	memberStatusKey := fmt.Sprintf(ctxdata.MeetingMemberDetailPrefix, in.MeetingId)
+	memberStatus := structs.MemberStatus{
+		MemberId:     in.UserId,
+		MicStatus:    in.MicStatus,
+		CameraStatus: in.CameraStatus,
+		ScreenStatus: in.ScreenStatus,
+	}
+	statusData, _ := json.Marshal(memberStatus)
+	err = l.svcCtx.Redis.HsetCtx(l.ctx, memberStatusKey, strconv.FormatUint((in.UserId), 10), string(statusData))
+	if err != nil {
+		l.Logger.Errorf("Failed to store member status in RedisHash: %v", err)
+		return &meeting.Result{
+			Code: code.ErrRedisOpCode,
+		}, nil
+	}
+
 	//入会成功
 	return &meeting.Result{
 		Code: code.SUCCESSCode,

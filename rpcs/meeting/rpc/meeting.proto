@@ -10,6 +10,7 @@ service Meeting{
   rpc EndMeeting(EndMeetingReq) returns (Result);
   rpc AppointmentMeeting(AppointmentMeetingReq) returns (Result);
   rpc JoinMeeting(JoinMeetingReq) returns (Result);
+  rpc LeaveMeeting(LeaveMeetingReq) returns (Result);
 //  rpc CancelMeeting(CancelMeetingReq) returns (Result);
 //  rpc UpdateMeeting(UpdateMeetingReq) returns (Result);
 }
@@ -41,16 +42,26 @@ message CreateMeetingReq{
 
 message StartMeetingReq{
   uint64 userIndex = 1;
-  uint64 meetingId = 2;
-  string meetingName = 3;
-  uint64 joinType = 4;
-  string password = 5;
+  uint64 userId = 2;
+  uint64 meetingId = 3;
+  string meetingName = 4;
+  uint64 joinType = 5;
+  string password = 6;
 }
 
 message JoinMeetingReq{
   uint64 userIndex = 1;
+  uint64 userId = 2;
+  uint64 meetingId = 3;
+  string password = 4;
+  uint64 micStatus = 5;
+  uint64 cameraStatus = 6;
+  uint64 screenStatus = 7;
+}
+
+message LeaveMeetingReq{
+  uint64 userId = 1;
   uint64 meetingId = 2;
-  string password = 5;
 }
 
 message EndMeetingReq{

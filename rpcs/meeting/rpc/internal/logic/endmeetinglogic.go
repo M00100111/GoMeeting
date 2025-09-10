@@ -30,6 +30,10 @@ func NewEndMeetingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EndMee
 }
 
 func (l *EndMeetingLogic) EndMeeting(in *meeting.EndMeetingReq) (*meeting.Result, error) {
+	// 无人时结束会议(待实现)
+	// 主持人结束会议后实现成员批量退会(待实现)
+
+	//主持人才可结束会议
 	//获取会议信息
 	//根据会议号查询会议信息主键
 	meetingInfo, err := l.svcCtx.MeetingInfoModel.FindOneByMeetingId(l.ctx, in.MeetingId)

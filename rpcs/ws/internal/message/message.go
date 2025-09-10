@@ -4,6 +4,7 @@ import "encoding/json"
 
 type MessageType uint8
 
+// 聊天消息
 const (
 	Err_Message MessageType = iota
 
@@ -11,12 +12,10 @@ const (
 )
 
 type Message struct {
-	MsgId       string `json:"msgId"`
+	SenderId    string `json:"senderId"` //发送者id
+	Method      string `json:"method"`   //请求方法
 	MessageType `json:"messageType"`
-
-	Method   string      `json:"method"`
-	SenderId string      `json:"senderId"`
-	Data     interface{} `json:"data"`
+	Data        interface{} `json:"data"` // 数据
 }
 
 // 解析conn接收到的二进制消息
