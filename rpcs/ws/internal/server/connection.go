@@ -26,6 +26,7 @@ type WsConn struct {
 	Message chan *message.Message
 }
 
+// 将当前客户端的http连接升级为websocket连接
 func NewWsConn(s *WsServer, w http.ResponseWriter, r *http.Request, uid string) *WsConn {
 	//调用Ws的websocket的Upgrade方法以升级http连接为websocket连接
 	c, err := s.Upgrader.Upgrade(w, r, nil)
@@ -33,6 +34,7 @@ func NewWsConn(s *WsServer, w http.ResponseWriter, r *http.Request, uid string) 
 		s.Errorf("websocket升级失败: %v", err)
 		return nil
 	}
+	//新建WsConn连接对象
 	conn := &WsConn{
 		WsServer:       s,
 		Conn:           c,
@@ -40,7 +42,7 @@ func NewWsConn(s *WsServer, w http.ResponseWriter, r *http.Request, uid string) 
 		Done:           make(chan struct{}),
 		lastActiveTime: time.Now(),
 	}
-	//连接保活
+	//闲置连接回收
 	go conn.keepalive()
 	return conn
 }

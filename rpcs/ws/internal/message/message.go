@@ -6,16 +6,15 @@ type MessageType uint8
 
 // 聊天消息
 const (
-	Err_Message MessageType = iota
-
-	Data_Message
+	Ping_Message MessageType = iota
+	Method_Message
 )
 
 type Message struct {
-	SenderId    string `json:"senderId"` //发送者id
-	Method      string `json:"method"`   //请求方法
-	MessageType `json:"messageType"`
-	Data        interface{} `json:"data"` // 数据
+	MessageType
+	SenderId string      `json:"senderId"` //发送者id
+	Method   string      `json:"method"`   //请求方法
+	Data     interface{} `json:"data"`     // 数据
 }
 
 // 解析conn接收到的二进制消息

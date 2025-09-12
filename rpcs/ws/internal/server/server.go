@@ -7,14 +7,19 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/threading"
 	"net/http"
 	"strconv"
 	"sync"
 )
 
+const (
+	defaultConcurrency = 10
+)
+
 // 定义全局WS服务器结构体
 type WsServer struct {
-	svc *svc.ServiceContext
+	svc *svc.ServiceContext //调用其他服务
 
 	Upgrader websocket.Upgrader // 用于升级为websocket服务
 	// 用户id-连接映射,实现统一管理
@@ -25,20 +30,35 @@ type WsServer struct {
 
 	routes map[string]WsHandlerFunc // 路由与WS处理函数映射
 
-	logx.Logger // 日志记录
+	*threading.TaskRunner // 异步任务管理
+	logx.Logger           // 日志记录
 }
 
+// 待实现选项模式
 func NewWsServer(ctx *svc.ServiceContext) *WsServer {
 	return &WsServer{
 		svc:        ctx,
 		connToUser: make(map[*WsConn]string),
 		userToConn: make(map[string]*WsConn),
 		routes:     make(map[string]WsHandlerFunc),
+		TaskRunner: threading.NewTaskRunner(defaultConcurrency),
 		Logger:     logx.WithContext(nil),
 	}
 }
 
-// 添加路由
+// WsServer服务启动
+func (s *WsServer) Start() {
+	http.HandleFunc(s.svc.Config.Pattern, s.BuildWsConn)
+	fmt.Println("websocket server start")
+	s.Info(http.ListenAndServe(s.svc.Config.ListenOn, nil))
+}
+
+// WsServer服务关闭
+func (s *WsServer) Stop() {
+
+}
+
+// 服务启动时注册方法与处理函数到全局路由
 func (s *WsServer) AddRoutes(rs []Route) {
 	for _, r := range rs {
 		s.routes[r.Method] = r.Handler
@@ -70,14 +90,14 @@ func (s *WsServer) BuildWsConn(w http.ResponseWriter, r *http.Request) {
 	if conn == nil {
 		return
 	}
-	//连接统一管理
+	// 注册ws连接到全局连接管理映射
 	s.addWsConn(conn)
 
-	// 启用协程以同时处理多个连接的请求
-	go s.handlerWsConn(conn)
+	// 启用协程以接收当前连接发来的信息
+	go s.readMessage(conn)
 }
 
-// 用于建立ws连接并管理ws连接
+// 注册ws连接到全局连接管理映射
 func (s *WsServer) addWsConn(conn *WsConn) {
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
@@ -123,6 +143,7 @@ func (s *WsServer) getUidsByWsConns(conns []*WsConn) []string {
 	return uids
 }
 
+// 注销WsConn连接
 func (s *WsServer) CloseWsServer(conn *WsConn) {
 	s.RWMutex.Lock()
 	defer s.RWMutex.Unlock()
@@ -133,24 +154,17 @@ func (s *WsServer) CloseWsServer(conn *WsConn) {
 	conn.CloseWsConn()
 }
 
-func (s *WsServer) Start() {
-	http.HandleFunc(s.svc.Config.Pattern, s.BuildWsConn)
-	fmt.Println("websocket server start")
-	s.Info(http.ListenAndServe(s.svc.Config.ListenOn, nil))
-}
-
-func (s *WsServer) Stop() {
-
-}
-
-// 启动协程为当前连接对象处理任务请求
-func (s *WsServer) handlerWsConn(conn *WsConn) {
+// Conn负责接收二进制消息
+// Message负责解析消息到结构体
+// readMessage将消息转发到对应的处理函数
+// 启动协程处理请求以处理同一连接对象的多个请求
+func (s *WsServer) readMessage(conn *WsConn) {
 	//处理消息,通过协程和chan等待处理好的消息，根据消息调用对应的处理函数
-	go s.handlerMessage(conn)
+	go s.handleMessage(conn)
 
 	//接收并解析和初步处理消息
 	for {
-		//获取二进制消息
+		//读取消息以获取二进制消息
 		_, data, err := conn.ReadMessage()
 		if err != nil {
 			s.Errorf("websocket conn read message err %v", err)
@@ -174,7 +188,7 @@ func (s *WsServer) handlerWsConn(conn *WsConn) {
 }
 
 // 消息处理
-func (s *WsServer) handlerMessage(conn *WsConn) {
+func (s *WsServer) handleMessage(conn *WsConn) {
 	for {
 		select {
 		//连接已关闭
@@ -183,18 +197,23 @@ func (s *WsServer) handlerMessage(conn *WsConn) {
 		case msg := <-conn.Message:
 			//根据消息类型进行处理
 			switch msg.MessageType {
-			case message.Data_Message:
+			case message.Ping_Message:
+				//心跳响应待实现
+			case message.Method_Message:
 				//根据请求的方法执行处理函数
 				if handler, ok := s.routes[msg.Method]; ok {
 					handler(s, conn, msg)
-				} else {
-					s.SendMessage(&message.Message{MessageType: message.Data_Message, Data: fmt.Sprintf("method %v not found", msg.Method)}, conn)
+				} else { // 方法不存在
+					s.SendMessage(&message.Message{MessageType: message.Method_Message, Data: fmt.Sprintf("method %v not found", msg.Method)}, conn)
 				}
 			}
 		}
 	}
 }
 
+// 消息推送
+// Conn负责接收二进制消息
+// Message负责解析消息到结构体
 func (s *WsServer) SendMessage(msg *message.Message, conns ...*WsConn) error {
 	data, err := message.BuildMessage(msg)
 	if err != nil {

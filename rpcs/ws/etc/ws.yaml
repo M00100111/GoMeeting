@@ -5,3 +5,7 @@ Pattern: "/ws"
 Jwt:
   AccessSecret: meeting
   AccessExpire: 8640000
+
+MongoDB:
+  URL: "mongodb://root:meeting@127.0.0.1:47017"
+  Db: chat

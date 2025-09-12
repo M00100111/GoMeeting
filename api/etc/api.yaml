@@ -24,3 +24,9 @@ MeetingRpc:
     Hosts:
       - 127.0.0.1:2379
     Key: meeting.rpc
+
+SocialRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: social.rpc

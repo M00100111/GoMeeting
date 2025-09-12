@@ -16,4 +16,5 @@ type Config struct {
 
 	UserRpc    zrpc.RpcClientConf
 	MeetingRpc zrpc.RpcClientConf
+	SocialRpc  zrpc.RpcClientConf
 }

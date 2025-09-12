@@ -1,0 +1,162 @@
+syntax = "proto3";  //指定协议版本
+package social; //默认包名,用于proto文件
+option go_package = "./social"; //默认包名,用于生成的代码
+
+//定义服务名
+service Social{
+  rpc PingSocial(PingReq) returns (Result);
+
+  rpc GetFriendList(GetFriendListReq) returns (GetFriendListResp);
+  rpc AddFriend(AddFriendReq) returns (AddFriendResp);
+  rpc DeleteFriend(DeleteFriendReq) returns (DeleteFriendResp);
+  rpc GetFriendRequestList(GetFriendRequestListReq) returns (GetFriendRequestListResp);
+  rpc HandleFriendRequest(HandleFriendRequestReq) returns (HandleFriendRequestResp);
+  rpc CreateFriend(CreateFriendReq) returns (CreateFriendResp);
+
+  rpc GetGroupList(GetGroupListReq) returns (GetGroupListResp);
+  rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
+  rpc DeleteGroup(DeleteGroupReq) returns (DeleteGroupResp);
+  rpc JoinGroup(JoinGroupReq) returns (JoinGroupResp);
+  rpc LeaveGroup(LeaveGroupReq) returns (LeaveGroupResp);
+  rpc GetGroupMemberList(GetGroupMemberListReq) returns (GetGroupMemberListResp);
+  rpc GetGroupRequestList(GetGroupRequestListReq) returns (GetGroupRequestListResp);
+  rpc HandleGroupRequest(HandleGroupRequestReq) returns (HandleGroupRequestResp);
+}
+
+message PingReq{
+  string msg = 1;
+}
+message Result{
+  int32 code = 1;
+  string msg = 2;
+}
+
+//好友数据结构
+message Friend {
+  uint64 friendIndex = 2;
+  string comment = 3;
+}
+message GetFriendListReq{
+  uint64 userIndex = 1;
+}
+message GetFriendListResp{
+  int32 code = 1;
+  string msg = 2;
+  repeated Friend FriendList = 3;
+}
+
+message AddFriendReq{
+  uint64 userIndex = 1;
+  uint64 friendIndex = 2;
+  string reqMsg = 3;
+}
+message AddFriendResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message DeleteFriendReq{
+  uint64 userIndex = 1;
+  uint64 friendIndex = 2;
+}
+message DeleteFriendResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+//好友数据结构
+message FriendRequest {
+  uint64 friendIndex = 1;
+  string reqMsg = 2;
+  int64 reqTime = 3;
+}
+message GetFriendRequestListReq{
+  uint64 userIndex = 1;
+}
+message GetFriendRequestListResp{
+  int32 code = 1;
+  string msg = 2;
+  repeated FriendRequest FriendRequestList = 3;
+}
+message HandleFriendRequestReq{
+  uint64 reqId = 1;
+  int64 handleResult = 2;
+  string handleMsg = 3;
+}
+message HandleFriendRequestResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message CreateFriendReq{
+  uint64 userIndex = 1;
+  uint64 friendIndex = 2;
+}
+message CreateFriendResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message GetGroupListReq{
+
+}
+message GetGroupListResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message CreateGroupReq{
+
+}
+message CreateGroupResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message DeleteGroupReq{
+
+}
+message DeleteGroupResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message JoinGroupReq{
+
+}
+message JoinGroupResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message LeaveGroupReq{
+
+}
+message LeaveGroupResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message GetGroupMemberListReq{
+
+}
+message GetGroupMemberListResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message GetGroupRequestListReq{
+
+}
+message GetGroupRequestListResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message HandleGroupRequestReq{
+
+}
+message HandleGroupRequestResp{
+  int32 code = 1;
+  string msg = 2;
+}

@@ -98,6 +98,10 @@ const (
 	MeetingUserNotInMeetingCode
 )
 
+const (
+	SocialFriendRequestNotExistCode = 30000 + iota
+)
+
 // 通用状态对象
 var (
 	Success  = RegisterCode(SUCCESSCode, "success")
@@ -143,3 +147,6 @@ var (
 	MeetingAlreadyIn          = RegisterCode(MeetingAlreadyInCode, "已在会议中")
 	MeetingUserNotInMeeting   = RegisterCode(MeetingUserNotInMeetingCode, "用户不在会议中")
 )
+
+// 社交相关错误码
+var ()
