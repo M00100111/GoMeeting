@@ -1,6 +1,7 @@
 package logic
 
 import (
+	code "GoMeeting/pkg/result"
 	"context"
 
 	"GoMeeting/rpcs/social/rpc/internal/svc"
@@ -24,7 +25,29 @@ func NewGetGroupRequestListLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *GetGroupRequestListLogic) GetGroupRequestList(in *social.GetGroupRequestListReq) (*social.GetGroupRequestListResp, error) {
-	// todo: add your logic here and delete this line
+	list, err := l.svcCtx.GroupRequestsModel.FindRowsByGroupIndex(l.ctx, in.GroupIndex)
 
-	return &social.GetGroupRequestListResp{}, nil
+	if err != nil {
+		l.Logger.Errorf("GetGroupRequestList GroupRequestsModel.FindRowsByGroupIndex error: %v", err)
+		return &social.GetGroupRequestListResp{
+			Code: code.ErrDbOpCode,
+		}, nil
+	}
+	var requestList []*social.GroupRequest
+	for _, request := range list {
+		requestList = append(requestList, &social.GroupRequest{
+			ReqId:        request.ReqId,
+			UserIndex:    request.UserIndex,
+			ReqMsg:       request.ReqMsg.String,
+			ReqTime:      request.ReqTime.Unix(),
+			HandlerIndex: request.HandlerIndex,
+			HandleResult: request.HandleResult,
+			HandleMsg:    request.HandleMsg.String,
+			HandleTime:   request.HandleTime.Time.Unix(),
+		})
+	}
+	return &social.GetGroupRequestListResp{
+		Code:             code.SUCCESSCode,
+		GroupRequestList: requestList,
+	}, nil
 }

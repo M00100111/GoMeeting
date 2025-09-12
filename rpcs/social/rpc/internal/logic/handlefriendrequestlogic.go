@@ -55,6 +55,13 @@ func (l *HandleFriendRequestLogic) HandleFriendRequest(in *social.HandleFriendRe
 		}, nil
 	}
 
+	//不同意直接返回
+	if in.HandleResult == HandleResultUnAccept {
+		return &social.HandleFriendRequestResp{
+			Code: code.SUCCESSCode,
+		}, nil
+	}
+
 	//发布添加好友任务(待实现)
 	//添加好友关系记录,冗余存储
 	err = createFriend(l, result.UserIndex, result.FriendIndex)

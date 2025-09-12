@@ -17,6 +17,8 @@ service Social{
   rpc CreateGroup(CreateGroupReq) returns (CreateGroupResp);
   rpc DeleteGroup(DeleteGroupReq) returns (DeleteGroupResp);
   rpc JoinGroup(JoinGroupReq) returns (JoinGroupResp);
+  rpc CreateGroupMember(CreateGroupMemberReq) returns (CreateGroupMemberResp);
+  rpc CreateGroupMemberRequest(CreateGroupMemberRequestReq) returns (CreateGroupMemberRequestResp);
   rpc LeaveGroup(LeaveGroupReq) returns (LeaveGroupResp);
   rpc GetGroupMemberList(GetGroupMemberListReq) returns (GetGroupMemberListResp);
   rpc GetGroupRequestList(GetGroupRequestListReq) returns (GetGroupRequestListResp);
@@ -97,16 +99,23 @@ message CreateFriendResp{
   string msg = 2;
 }
 
+message Group {
+  uint64 groupId = 1;
+  string groupName = 2;
+}
 message GetGroupListReq{
-
+  uint64 userIndex = 1;
 }
 message GetGroupListResp{
   int32 code = 1;
   string msg = 2;
+  repeated Group groupList = 3;
 }
 
 message CreateGroupReq{
-
+  uint64 userIndex = 1;
+  string groupName = 2;
+  int64 joinStatus = 3;
 }
 message CreateGroupResp{
   int32 code = 1;
@@ -122,9 +131,30 @@ message DeleteGroupResp{
 }
 
 message JoinGroupReq{
-
+    uint64 groupId = 1;
+    uint64 userIndex = 2;
+    string reqMsg = 3;
 }
 message JoinGroupResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message CreateGroupMemberReq{
+  uint64 groupIndex = 1;
+  uint64 userIndex = 2;
+}
+message CreateGroupMemberResp{
+  int32 code = 1;
+  string msg = 2;
+}
+
+message CreateGroupMemberRequestReq{
+  uint64 groupIndex = 1;
+  uint64 userIndex = 2;
+  string reqMsg = 3;
+}
+message CreateGroupMemberRequestResp{
   int32 code = 1;
   string msg = 2;
 }
@@ -137,24 +167,44 @@ message LeaveGroupResp{
   string msg = 2;
 }
 
+message GroupMember{
+  uint64 userIndex = 1;
+  uint64 userType = 2;
+  uint64 userStatus = 3;
+}
 message GetGroupMemberListReq{
-
+  uint64 groupIndex = 1;
 }
 message GetGroupMemberListResp{
   int32 code = 1;
   string msg = 2;
+  repeated GroupMember groupMemberList = 3;
 }
 
+message GroupRequest{
+  uint64 reqId = 1;
+  uint64 userIndex = 2;
+  string reqMsg = 3;
+  int64 reqTime = 4;
+  uint64 handlerIndex = 5;
+  int64 handleResult = 6;
+  string handleMsg = 7;
+  int64 handleTime = 8;
+}
 message GetGroupRequestListReq{
-
+  uint64 groupIndex = 1;
 }
 message GetGroupRequestListResp{
   int32 code = 1;
   string msg = 2;
+  repeated GroupRequest groupRequestList = 3;
 }
 
 message HandleGroupRequestReq{
-
+  uint64 reqId = 1;
+  uint64 handlerIndex = 2;
+  int64 handleResult = 3;
+  string handleMsg = 4;
 }
 message HandleGroupRequestResp{
   int32 code = 1;

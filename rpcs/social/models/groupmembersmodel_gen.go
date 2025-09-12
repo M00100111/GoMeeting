@@ -35,6 +35,8 @@ type (
 		FindOneByGroupIndexUserIndex(ctx context.Context, groupIndex uint64, userIndex uint64) (*GroupMembers, error)
 		Update(ctx context.Context, data *GroupMembers) error
 		Delete(ctx context.Context, id uint64) error
+
+		FindRowsByGroupIndex(ctx context.Context, groupIndex uint64)(list []*GroupMembers, err error)
 	}
 
 	defaultGroupMembersModel struct {
@@ -148,4 +150,10 @@ func (m *defaultGroupMembersModel) queryPrimary(ctx context.Context, conn sqlx.S
 
 func (m *defaultGroupMembersModel) tableName() string {
 	return m.table
+}
+
+func (m *defaultGroupMembersModel) FindRowsByGroupIndex(ctx context.Context, groupIndex uint64)(list []*GroupMembers, err error){
+	query := fmt.Sprintf("select %s from %s where `group_index` = ?", groupMembersRows, m.table)
+	err = m.QueryRowsNoCacheCtx(ctx,list,query,groupIndex)
+	return
 }

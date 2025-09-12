@@ -1,10 +1,13 @@
 package logic
 
 import (
-	"context"
-
+	code "GoMeeting/pkg/result"
+	"GoMeeting/pkg/rnum"
+	"GoMeeting/rpcs/social/models"
 	"GoMeeting/rpcs/social/rpc/internal/svc"
 	"GoMeeting/rpcs/social/rpc/social"
+	"context"
+	"strconv"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +27,21 @@ func NewCreateGroupLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Creat
 }
 
 func (l *CreateGroupLogic) CreateGroup(in *social.CreateGroupReq) (*social.CreateGroupResp, error) {
-	// todo: add your logic here and delete this line
-
-	return &social.CreateGroupResp{}, nil
+	groupIdStr := rnum.GenerateNumber(12)
+	groupId, _ := strconv.ParseUint(groupIdStr, 10, 64)
+	_, err := l.svcCtx.GroupsModel.Insert(l.ctx, &models.Groups{
+		GroupId:    groupId,
+		GroupName:  in.GroupName,
+		UserIndex:  in.UserIndex,
+		JoinStatus: in.JoinStatus,
+	})
+	if err != nil {
+		l.Logger.Errorf("GroupsModel.Insert error: %v", err)
+		return &social.CreateGroupResp{
+			Code: code.ErrDbOpCode,
+		}, nil
+	}
+	return &social.CreateGroupResp{
+		Code: code.SUCCESSCode,
+	}, nil
 }

@@ -30,10 +30,10 @@ CREATE TABLE `friend_requests` (
 
 CREATE TABLE `groups` (
    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-   `group_id` BIGINT(20) unsigned NOT NULL COMMENT '群聊Id',
+   `group_id` BIGINT(12) unsigned NOT NULL COMMENT '群聊Id',
    `group_name` varchar(100) NOT NULL DEFAULT '' COMMENT '群聊名称',
    `user_index` BIGINT(20) unsigned NOT NULL COMMENT '群主主键',
-   `group_status` tinyint(1) DEFAULT 0 COMMENT '入群状态:0-正常，1-禁言',
+   `group_status` tinyint(1) DEFAULT 0 COMMENT '群状态:0-正常，1-禁言',
    `join_status` tinyint(1) DEFAULT 0 COMMENT '入群方式:0-开放，1-申请',
    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -61,6 +61,7 @@ CREATE  TABLE `group_members`(
 
 CREATE TABLE `group_requests` (
    `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+   `req_id` bigint(20) unsigned NOT NULL COMMENT '入群请求ID',
    `user_index` BIGINT(20) unsigned NOT NULL COMMENT '用户主键',
    `group_index` BIGINT(20) unsigned NOT NULL COMMENT '群聊主键',
    `req_msg` varchar(255) DEFAULT NULL COMMENT '申请信息',

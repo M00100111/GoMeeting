@@ -14,38 +14,45 @@ import (
 )
 
 type (
-	AddFriendReq             = social.AddFriendReq
-	AddFriendResp            = social.AddFriendResp
-	CreateFriendReq          = social.CreateFriendReq
-	CreateFriendResp         = social.CreateFriendResp
-	CreateGroupReq           = social.CreateGroupReq
-	CreateGroupResp          = social.CreateGroupResp
-	DeleteFriendReq          = social.DeleteFriendReq
-	DeleteFriendResp         = social.DeleteFriendResp
-	DeleteGroupReq           = social.DeleteGroupReq
-	DeleteGroupResp          = social.DeleteGroupResp
-	Friend                   = social.Friend
-	FriendRequest            = social.FriendRequest
-	GetFriendListReq         = social.GetFriendListReq
-	GetFriendListResp        = social.GetFriendListResp
-	GetFriendRequestListReq  = social.GetFriendRequestListReq
-	GetFriendRequestListResp = social.GetFriendRequestListResp
-	GetGroupListReq          = social.GetGroupListReq
-	GetGroupListResp         = social.GetGroupListResp
-	GetGroupMemberListReq    = social.GetGroupMemberListReq
-	GetGroupMemberListResp   = social.GetGroupMemberListResp
-	GetGroupRequestListReq   = social.GetGroupRequestListReq
-	GetGroupRequestListResp  = social.GetGroupRequestListResp
-	HandleFriendRequestReq   = social.HandleFriendRequestReq
-	HandleFriendRequestResp  = social.HandleFriendRequestResp
-	HandleGroupRequestReq    = social.HandleGroupRequestReq
-	HandleGroupRequestResp   = social.HandleGroupRequestResp
-	JoinGroupReq             = social.JoinGroupReq
-	JoinGroupResp            = social.JoinGroupResp
-	LeaveGroupReq            = social.LeaveGroupReq
-	LeaveGroupResp           = social.LeaveGroupResp
-	PingReq                  = social.PingReq
-	Result                   = social.Result
+	AddFriendReq                 = social.AddFriendReq
+	AddFriendResp                = social.AddFriendResp
+	CreateFriendReq              = social.CreateFriendReq
+	CreateFriendResp             = social.CreateFriendResp
+	CreateGroupMemberReq         = social.CreateGroupMemberReq
+	CreateGroupMemberRequestReq  = social.CreateGroupMemberRequestReq
+	CreateGroupMemberRequestResp = social.CreateGroupMemberRequestResp
+	CreateGroupMemberResp        = social.CreateGroupMemberResp
+	CreateGroupReq               = social.CreateGroupReq
+	CreateGroupResp              = social.CreateGroupResp
+	DeleteFriendReq              = social.DeleteFriendReq
+	DeleteFriendResp             = social.DeleteFriendResp
+	DeleteGroupReq               = social.DeleteGroupReq
+	DeleteGroupResp              = social.DeleteGroupResp
+	Friend                       = social.Friend
+	FriendRequest                = social.FriendRequest
+	GetFriendListReq             = social.GetFriendListReq
+	GetFriendListResp            = social.GetFriendListResp
+	GetFriendRequestListReq      = social.GetFriendRequestListReq
+	GetFriendRequestListResp     = social.GetFriendRequestListResp
+	GetGroupListReq              = social.GetGroupListReq
+	GetGroupListResp             = social.GetGroupListResp
+	GetGroupMemberListReq        = social.GetGroupMemberListReq
+	GetGroupMemberListResp       = social.GetGroupMemberListResp
+	GetGroupRequestListReq       = social.GetGroupRequestListReq
+	GetGroupRequestListResp      = social.GetGroupRequestListResp
+	Group                        = social.Group
+	GroupMember                  = social.GroupMember
+	GroupRequest                 = social.GroupRequest
+	HandleFriendRequestReq       = social.HandleFriendRequestReq
+	HandleFriendRequestResp      = social.HandleFriendRequestResp
+	HandleGroupRequestReq        = social.HandleGroupRequestReq
+	HandleGroupRequestResp       = social.HandleGroupRequestResp
+	JoinGroupReq                 = social.JoinGroupReq
+	JoinGroupResp                = social.JoinGroupResp
+	LeaveGroupReq                = social.LeaveGroupReq
+	LeaveGroupResp               = social.LeaveGroupResp
+	PingReq                      = social.PingReq
+	Result                       = social.Result
 
 	Social interface {
 		PingSocial(ctx context.Context, in *PingReq, opts ...grpc.CallOption) (*Result, error)
@@ -59,6 +66,8 @@ type (
 		CreateGroup(ctx context.Context, in *CreateGroupReq, opts ...grpc.CallOption) (*CreateGroupResp, error)
 		DeleteGroup(ctx context.Context, in *DeleteGroupReq, opts ...grpc.CallOption) (*DeleteGroupResp, error)
 		JoinGroup(ctx context.Context, in *JoinGroupReq, opts ...grpc.CallOption) (*JoinGroupResp, error)
+		CreateGroupMember(ctx context.Context, in *CreateGroupMemberReq, opts ...grpc.CallOption) (*CreateGroupMemberResp, error)
+		CreateGroupMemberRequest(ctx context.Context, in *CreateGroupMemberRequestReq, opts ...grpc.CallOption) (*CreateGroupMemberRequestResp, error)
 		LeaveGroup(ctx context.Context, in *LeaveGroupReq, opts ...grpc.CallOption) (*LeaveGroupResp, error)
 		GetGroupMemberList(ctx context.Context, in *GetGroupMemberListReq, opts ...grpc.CallOption) (*GetGroupMemberListResp, error)
 		GetGroupRequestList(ctx context.Context, in *GetGroupRequestListReq, opts ...grpc.CallOption) (*GetGroupRequestListResp, error)
@@ -129,6 +138,16 @@ func (m *defaultSocial) DeleteGroup(ctx context.Context, in *DeleteGroupReq, opt
 func (m *defaultSocial) JoinGroup(ctx context.Context, in *JoinGroupReq, opts ...grpc.CallOption) (*JoinGroupResp, error) {
 	client := social.NewSocialClient(m.cli.Conn())
 	return client.JoinGroup(ctx, in, opts...)
+}
+
+func (m *defaultSocial) CreateGroupMember(ctx context.Context, in *CreateGroupMemberReq, opts ...grpc.CallOption) (*CreateGroupMemberResp, error) {
+	client := social.NewSocialClient(m.cli.Conn())
+	return client.CreateGroupMember(ctx, in, opts...)
+}
+
+func (m *defaultSocial) CreateGroupMemberRequest(ctx context.Context, in *CreateGroupMemberRequestReq, opts ...grpc.CallOption) (*CreateGroupMemberRequestResp, error) {
+	client := social.NewSocialClient(m.cli.Conn())
+	return client.CreateGroupMemberRequest(ctx, in, opts...)
 }
 
 func (m *defaultSocial) LeaveGroup(ctx context.Context, in *LeaveGroupReq, opts ...grpc.CallOption) (*LeaveGroupResp, error) {

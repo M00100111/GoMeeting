@@ -33,6 +33,8 @@ type (
 		FindOne(ctx context.Context, id uint64) (*GroupRequests, error)
 		Update(ctx context.Context, data *GroupRequests) error
 		Delete(ctx context.Context, id uint64) error
+
+		FindRowsByGroupIndex(ctx context.Context, groupIndex uint64)(list []*GroupRequests, err error)
 	}
 
 	defaultGroupRequestsModel struct {
@@ -42,6 +44,7 @@ type (
 
 	GroupRequests struct {
 		Id           uint64         `db:"id"`            // 主键
+		ReqId        uint64         `db:"req_id"`        // 入群请求ID
 		UserIndex    uint64         `db:"user_index"`    // 用户主键
 		GroupIndex   uint64         `db:"group_index"`   // 群聊主键
 		ReqMsg       sql.NullString `db:"req_msg"`       // 申请信息
@@ -89,8 +92,8 @@ func (m *defaultGroupRequestsModel) FindOne(ctx context.Context, id uint64) (*Gr
 func (m *defaultGroupRequestsModel) Insert(ctx context.Context, data *GroupRequests) (sql.Result, error) {
 	groupRequestsIdKey := fmt.Sprintf("%s%v", cacheGroupRequestsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, groupRequestsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserIndex, data.GroupIndex, data.ReqMsg, data.ReqTime, data.HandlerIndex, data.HandleResult, data.HandleMsg, data.HandleTime)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, groupRequestsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.ReqId, data.UserIndex, data.GroupIndex, data.ReqMsg, data.ReqTime, data.HandlerIndex, data.HandleResult, data.HandleMsg, data.HandleTime)
 	}, groupRequestsIdKey)
 	return ret, err
 }
@@ -99,7 +102,7 @@ func (m *defaultGroupRequestsModel) Update(ctx context.Context, data *GroupReque
 	groupRequestsIdKey := fmt.Sprintf("%s%v", cacheGroupRequestsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, groupRequestsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserIndex, data.GroupIndex, data.ReqMsg, data.ReqTime, data.HandlerIndex, data.HandleResult, data.HandleMsg, data.HandleTime, data.Id)
+		return conn.ExecCtx(ctx, query, data.ReqId, data.UserIndex, data.GroupIndex, data.ReqMsg, data.ReqTime, data.HandlerIndex, data.HandleResult, data.HandleMsg, data.HandleTime, data.Id)
 	}, groupRequestsIdKey)
 	return err
 }
@@ -115,4 +118,10 @@ func (m *defaultGroupRequestsModel) queryPrimary(ctx context.Context, conn sqlx.
 
 func (m *defaultGroupRequestsModel) tableName() string {
 	return m.table
+}
+
+func (m *defaultGroupRequestsModel) FindRowsByGroupIndex(ctx context.Context, groupIndex uint64)(list []*GroupRequests, err error){
+	query := fmt.Sprintf("select %s from %s where `group_index` = ?", groupRequestsRows, m.table)
+	err = m.QueryRowsNoCacheCtx(ctx,list,query,groupIndex)
+	return
 }

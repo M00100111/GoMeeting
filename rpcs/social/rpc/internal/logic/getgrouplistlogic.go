@@ -1,6 +1,7 @@
 package logic
 
 import (
+	code "GoMeeting/pkg/result"
 	"context"
 
 	"GoMeeting/rpcs/social/rpc/internal/svc"
@@ -24,7 +25,23 @@ func NewGetGroupListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetG
 }
 
 func (l *GetGroupListLogic) GetGroupList(in *social.GetGroupListReq) (*social.GetGroupListResp, error) {
-	// todo: add your logic here and delete this line
+	list, err := l.svcCtx.GroupsModel.FindRowsByUserIndex(l.ctx, in.UserIndex)
 
-	return &social.GetGroupListResp{}, nil
+	if err != nil {
+		l.Logger.Errorf("GetGroupList GroupsModel.FindRowsByUserIndex error: %v", err)
+		return &social.GetGroupListResp{
+			Code: code.ErrDbOpCode,
+		}, nil
+	}
+	var groupList []*social.Group
+	for _, group := range list {
+		groupList = append(groupList, &social.Group{
+			GroupId:   group.GroupId,
+			GroupName: group.GroupName,
+		})
+	}
+	return &social.GetGroupListResp{
+		Code:      code.SUCCESSCode,
+		GroupList: groupList,
+	}, nil
 }

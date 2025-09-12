@@ -78,6 +78,16 @@ func (s *SocialServer) JoinGroup(ctx context.Context, in *social.JoinGroupReq) (
 	return l.JoinGroup(in)
 }
 
+func (s *SocialServer) CreateGroupMember(ctx context.Context, in *social.CreateGroupMemberReq) (*social.CreateGroupMemberResp, error) {
+	l := logic.NewCreateGroupMemberLogic(ctx, s.svcCtx)
+	return l.CreateGroupMember(in)
+}
+
+func (s *SocialServer) CreateGroupMemberRequest(ctx context.Context, in *social.CreateGroupMemberRequestReq) (*social.CreateGroupMemberRequestResp, error) {
+	l := logic.NewCreateGroupMemberRequestLogic(ctx, s.svcCtx)
+	return l.CreateGroupMemberRequest(in)
+}
+
 func (s *SocialServer) LeaveGroup(ctx context.Context, in *social.LeaveGroupReq) (*social.LeaveGroupResp, error) {
 	l := logic.NewLeaveGroupLogic(ctx, s.svcCtx)
 	return l.LeaveGroup(in)

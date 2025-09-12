@@ -19,21 +19,23 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Social_PingSocial_FullMethodName           = "/social.Social/PingSocial"
-	Social_GetFriendList_FullMethodName        = "/social.Social/GetFriendList"
-	Social_AddFriend_FullMethodName            = "/social.Social/AddFriend"
-	Social_DeleteFriend_FullMethodName         = "/social.Social/DeleteFriend"
-	Social_GetFriendRequestList_FullMethodName = "/social.Social/GetFriendRequestList"
-	Social_HandleFriendRequest_FullMethodName  = "/social.Social/HandleFriendRequest"
-	Social_CreateFriend_FullMethodName         = "/social.Social/CreateFriend"
-	Social_GetGroupList_FullMethodName         = "/social.Social/GetGroupList"
-	Social_CreateGroup_FullMethodName          = "/social.Social/CreateGroup"
-	Social_DeleteGroup_FullMethodName          = "/social.Social/DeleteGroup"
-	Social_JoinGroup_FullMethodName            = "/social.Social/JoinGroup"
-	Social_LeaveGroup_FullMethodName           = "/social.Social/LeaveGroup"
-	Social_GetGroupMemberList_FullMethodName   = "/social.Social/GetGroupMemberList"
-	Social_GetGroupRequestList_FullMethodName  = "/social.Social/GetGroupRequestList"
-	Social_HandleGroupRequest_FullMethodName   = "/social.Social/HandleGroupRequest"
+	Social_PingSocial_FullMethodName               = "/social.Social/PingSocial"
+	Social_GetFriendList_FullMethodName            = "/social.Social/GetFriendList"
+	Social_AddFriend_FullMethodName                = "/social.Social/AddFriend"
+	Social_DeleteFriend_FullMethodName             = "/social.Social/DeleteFriend"
+	Social_GetFriendRequestList_FullMethodName     = "/social.Social/GetFriendRequestList"
+	Social_HandleFriendRequest_FullMethodName      = "/social.Social/HandleFriendRequest"
+	Social_CreateFriend_FullMethodName             = "/social.Social/CreateFriend"
+	Social_GetGroupList_FullMethodName             = "/social.Social/GetGroupList"
+	Social_CreateGroup_FullMethodName              = "/social.Social/CreateGroup"
+	Social_DeleteGroup_FullMethodName              = "/social.Social/DeleteGroup"
+	Social_JoinGroup_FullMethodName                = "/social.Social/JoinGroup"
+	Social_CreateGroupMember_FullMethodName        = "/social.Social/CreateGroupMember"
+	Social_CreateGroupMemberRequest_FullMethodName = "/social.Social/CreateGroupMemberRequest"
+	Social_LeaveGroup_FullMethodName               = "/social.Social/LeaveGroup"
+	Social_GetGroupMemberList_FullMethodName       = "/social.Social/GetGroupMemberList"
+	Social_GetGroupRequestList_FullMethodName      = "/social.Social/GetGroupRequestList"
+	Social_HandleGroupRequest_FullMethodName       = "/social.Social/HandleGroupRequest"
 )
 
 // SocialClient is the client API for Social service.
@@ -53,6 +55,8 @@ type SocialClient interface {
 	CreateGroup(ctx context.Context, in *CreateGroupReq, opts ...grpc.CallOption) (*CreateGroupResp, error)
 	DeleteGroup(ctx context.Context, in *DeleteGroupReq, opts ...grpc.CallOption) (*DeleteGroupResp, error)
 	JoinGroup(ctx context.Context, in *JoinGroupReq, opts ...grpc.CallOption) (*JoinGroupResp, error)
+	CreateGroupMember(ctx context.Context, in *CreateGroupMemberReq, opts ...grpc.CallOption) (*CreateGroupMemberResp, error)
+	CreateGroupMemberRequest(ctx context.Context, in *CreateGroupMemberRequestReq, opts ...grpc.CallOption) (*CreateGroupMemberRequestResp, error)
 	LeaveGroup(ctx context.Context, in *LeaveGroupReq, opts ...grpc.CallOption) (*LeaveGroupResp, error)
 	GetGroupMemberList(ctx context.Context, in *GetGroupMemberListReq, opts ...grpc.CallOption) (*GetGroupMemberListResp, error)
 	GetGroupRequestList(ctx context.Context, in *GetGroupRequestListReq, opts ...grpc.CallOption) (*GetGroupRequestListResp, error)
@@ -177,6 +181,26 @@ func (c *socialClient) JoinGroup(ctx context.Context, in *JoinGroupReq, opts ...
 	return out, nil
 }
 
+func (c *socialClient) CreateGroupMember(ctx context.Context, in *CreateGroupMemberReq, opts ...grpc.CallOption) (*CreateGroupMemberResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateGroupMemberResp)
+	err := c.cc.Invoke(ctx, Social_CreateGroupMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialClient) CreateGroupMemberRequest(ctx context.Context, in *CreateGroupMemberRequestReq, opts ...grpc.CallOption) (*CreateGroupMemberRequestResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateGroupMemberRequestResp)
+	err := c.cc.Invoke(ctx, Social_CreateGroupMemberRequest_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *socialClient) LeaveGroup(ctx context.Context, in *LeaveGroupReq, opts ...grpc.CallOption) (*LeaveGroupResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(LeaveGroupResp)
@@ -234,6 +258,8 @@ type SocialServer interface {
 	CreateGroup(context.Context, *CreateGroupReq) (*CreateGroupResp, error)
 	DeleteGroup(context.Context, *DeleteGroupReq) (*DeleteGroupResp, error)
 	JoinGroup(context.Context, *JoinGroupReq) (*JoinGroupResp, error)
+	CreateGroupMember(context.Context, *CreateGroupMemberReq) (*CreateGroupMemberResp, error)
+	CreateGroupMemberRequest(context.Context, *CreateGroupMemberRequestReq) (*CreateGroupMemberRequestResp, error)
 	LeaveGroup(context.Context, *LeaveGroupReq) (*LeaveGroupResp, error)
 	GetGroupMemberList(context.Context, *GetGroupMemberListReq) (*GetGroupMemberListResp, error)
 	GetGroupRequestList(context.Context, *GetGroupRequestListReq) (*GetGroupRequestListResp, error)
@@ -280,6 +306,12 @@ func (UnimplementedSocialServer) DeleteGroup(context.Context, *DeleteGroupReq) (
 }
 func (UnimplementedSocialServer) JoinGroup(context.Context, *JoinGroupReq) (*JoinGroupResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method JoinGroup not implemented")
+}
+func (UnimplementedSocialServer) CreateGroupMember(context.Context, *CreateGroupMemberReq) (*CreateGroupMemberResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGroupMember not implemented")
+}
+func (UnimplementedSocialServer) CreateGroupMemberRequest(context.Context, *CreateGroupMemberRequestReq) (*CreateGroupMemberRequestResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateGroupMemberRequest not implemented")
 }
 func (UnimplementedSocialServer) LeaveGroup(context.Context, *LeaveGroupReq) (*LeaveGroupResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LeaveGroup not implemented")
@@ -512,6 +544,42 @@ func _Social_JoinGroup_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Social_CreateGroupMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGroupMemberReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServer).CreateGroupMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Social_CreateGroupMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServer).CreateGroupMember(ctx, req.(*CreateGroupMemberReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Social_CreateGroupMemberRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateGroupMemberRequestReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServer).CreateGroupMemberRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Social_CreateGroupMemberRequest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServer).CreateGroupMemberRequest(ctx, req.(*CreateGroupMemberRequestReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Social_LeaveGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LeaveGroupReq)
 	if err := dec(in); err != nil {
@@ -634,6 +702,14 @@ var Social_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "JoinGroup",
 			Handler:    _Social_JoinGroup_Handler,
+		},
+		{
+			MethodName: "CreateGroupMember",
+			Handler:    _Social_CreateGroupMember_Handler,
+		},
+		{
+			MethodName: "CreateGroupMemberRequest",
+			Handler:    _Social_CreateGroupMemberRequest_Handler,
 		},
 		{
 			MethodName: "LeaveGroup",

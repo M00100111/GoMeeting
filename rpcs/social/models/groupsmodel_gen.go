@@ -35,6 +35,8 @@ type (
 		FindOneByGroupId(ctx context.Context, groupId uint64) (*Groups, error)
 		Update(ctx context.Context, data *Groups) error
 		Delete(ctx context.Context, id uint64) error
+
+		FindRowsByUserIndex(ctx context.Context, userIndex uint64)(list []*Groups, err error)
 	}
 
 	defaultGroupsModel struct {
@@ -47,7 +49,7 @@ type (
 		GroupId     uint64       `db:"group_id"`     // 群聊Id
 		GroupName   string       `db:"group_name"`   // 群聊名称
 		UserIndex   uint64       `db:"user_index"`   // 群主主键
-		GroupStatus int64        `db:"group_status"` // 入群状态:0-正常，1-禁言
+		GroupStatus int64        `db:"group_status"` // 群状态:0-正常，1-禁言
 		JoinStatus  int64        `db:"join_status"`  // 入群方式:0-开放，1-申请
 		CreateTime  time.Time    `db:"create_time"`  // 创建时间
 		UpdateTime  time.Time    `db:"update_time"`  // 更新时间
@@ -150,4 +152,10 @@ func (m *defaultGroupsModel) queryPrimary(ctx context.Context, conn sqlx.SqlConn
 
 func (m *defaultGroupsModel) tableName() string {
 	return m.table
+}
+
+func (m *defaultGroupsModel) FindRowsByUserIndex(ctx context.Context, userIndex uint64)(list []*Groups, err error){
+	query := fmt.Sprintf("select %s from %s where `user_index` = ?", groupsRows, m.table)
+	err = m.QueryRowsNoCacheCtx(ctx,list,query,userIndex)
+	return
 }
