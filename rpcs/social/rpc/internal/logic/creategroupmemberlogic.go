@@ -25,6 +25,7 @@ func NewCreateGroupMemberLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 }
 
 func (l *CreateGroupMemberLogic) CreateGroupMember(in *social.CreateGroupMemberReq) (*social.CreateGroupMemberResp, error) {
+	//添加成员,由api层实现将群组成员id信息set存放于redis(待实现)
 	_, err := l.svcCtx.GroupMembersModel.Insert(l.ctx, &models.GroupMembers{
 		GroupIndex: in.GroupIndex,
 		UserIndex:  in.UserIndex,

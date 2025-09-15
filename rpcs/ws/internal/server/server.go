@@ -4,9 +4,11 @@ import (
 	"GoMeeting/pkg/ctxdata"
 	"GoMeeting/rpcs/ws/internal/message"
 	"GoMeeting/rpcs/ws/internal/svc"
+	"context"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/threading"
 	"net/http"
 	"strconv"
@@ -32,6 +34,10 @@ type WsServer struct {
 
 	*threading.TaskRunner // 异步任务管理
 	logx.Logger           // 日志记录
+}
+
+func (s *WsServer) GetRedisClient() *redis.Redis {
+	return s.svc.Redis
 }
 
 // 待实现选项模式
@@ -111,19 +117,19 @@ func (s *WsServer) addWsConn(conn *WsConn) {
 }
 
 // 全局连接映射管理的查操作
-func (s *WsServer) getWsConnByUid(uid string) *WsConn {
+func (s *WsServer) GetWsConnByUid(uid string) *WsConn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 	return s.userToConn[uid]
 }
 
-func (s *WsServer) getUidByWsConn(conn *WsConn) string {
+func (s *WsServer) GetUidByWsConn(conn *WsConn) string {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 	return s.connToUser[conn]
 }
 
-func (s *WsServer) getWsConnsByUids(uids []string) []*WsConn {
+func (s *WsServer) GetWsConnsByUids(uids []string) []*WsConn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 	var conns []*WsConn
@@ -133,7 +139,7 @@ func (s *WsServer) getWsConnsByUids(uids []string) []*WsConn {
 	return conns
 }
 
-func (s *WsServer) getUidsByWsConns(conns []*WsConn) []string {
+func (s *WsServer) GetUidsByWsConns(conns []*WsConn) []string {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
 	var uids []string
@@ -160,7 +166,8 @@ func (s *WsServer) CloseWsServer(conn *WsConn) {
 // 启动协程处理请求以处理同一连接对象的多个请求
 func (s *WsServer) readMessage(conn *WsConn) {
 	//处理消息,通过协程和chan等待处理好的消息，根据消息调用对应的处理函数
-	go s.handleMessage(conn)
+	//go s.handleMessage(conn)
+	// 改为发布任务
 
 	//接收并解析和初步处理消息
 	for {
@@ -173,56 +180,65 @@ func (s *WsServer) readMessage(conn *WsConn) {
 			return
 		}
 
-		//解析消息
-		msg, err := message.ParseMessage(data)
-		if err != nil {
-			s.Errorf("json unmarshal err %v, msg %v", err, string(data))
-			// 关闭连接对象
+		//发布任务
+		if err = s.svc.KafkaPusher.Push(context.Background(), string(data)); err != nil {
+			s.Logger.Errorf("kafka push err %v", err)
 			s.CloseWsServer(conn)
 			return
 		}
 
+		// 改为发布任务
+		//解析消息
+		//msg, err := message.ParseMessage(data)
+		//if err != nil {
+		//	s.Errorf("json unmarshal err %v, msg %v", err, string(data))
+		//	// 关闭连接对象
+		//	s.CloseWsServer(conn)
+		//	return
+		//}
 		//处理消息
-		conn.Message <- msg
+		//conn.Message <- msg
 	}
 }
 
-// 消息处理
-func (s *WsServer) handleMessage(conn *WsConn) {
-	for {
-		select {
-		//连接已关闭
-		case <-conn.Done:
-			return
-		case msg := <-conn.Message:
-			//根据消息类型进行处理
-			switch msg.MessageType {
-			case message.Ping_Message:
-				//心跳响应待实现
-			case message.Method_Message:
-				//根据请求的方法执行处理函数
-				if handler, ok := s.routes[msg.Method]; ok {
-					handler(s, conn, msg)
-				} else { // 方法不存在
-					s.SendMessage(&message.Message{MessageType: message.Method_Message, Data: fmt.Sprintf("method %v not found", msg.Method)}, conn)
-				}
-			}
-		}
-	}
-}
+// 消息处理,由直接调用处理函数改为发布任务
+//func (s *WsServer) handleMessage(conn *WsConn) {
+//	for {
+//		select {
+//		//连接已关闭
+//		case <-conn.Done:
+//			return
+//		case msg := <-conn.Message:
+//			//发布任务
+//
+//			//根据消息类型进行处理
+//			switch msg.MessageType {
+//			case message.Ping_Message:
+//				//心跳响应待实现
+//			case message.Chat_Message:
+//				//根据请求的方法执行处理函数
+//				if handler, ok := s.routes[msg.Method]; ok {
+//					handler(s, conn, msg)
+//				} else { // 方法不存在
+//					s.SendMessage(&message.Message{MessageType: message.Chat_Message, Data: fmt.Sprintf("method %v not found", msg.Method)}, conn)
+//				}
+//			}
+//		}
+//	}
+//}
 
 // 消息推送
 // Conn负责接收二进制消息
 // Message负责解析消息到结构体
-func (s *WsServer) SendMessage(msg *message.Message, conns ...*WsConn) error {
-	data, err := message.BuildMessage(msg)
+func (s *WsServer) SendMessage(msg *message.Message, data interface{}, conns ...*WsConn) error {
+	result, err := message.BuildMessage(msg, data)
 	if err != nil {
 		s.Errorf("json marshal err %v", err)
 		return err
 	}
 	//群发消息可单发
 	for _, conn := range conns {
-		if err = conn.WriteMessage(websocket.TextMessage, data); err != nil {
+		if err = conn.WriteMessage(websocket.TextMessage, result); err != nil {
 			return err
 		}
 	}

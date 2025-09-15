@@ -1,7 +1,6 @@
 package server
 
 import (
-	"GoMeeting/rpcs/ws/internal/message"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
@@ -23,7 +22,7 @@ type WsConn struct {
 	lastActiveTime      time.Time //最后一次活跃时间
 
 	//用于通信的管道
-	Message chan *message.Message
+	//Message chan *message.Message
 }
 
 // 将当前客户端的http连接升级为websocket连接

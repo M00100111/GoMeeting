@@ -2,6 +2,11 @@ Name: ws
 ListenOn: 0.0.0.0:8081
 Pattern: "/ws"
 
+Redis:
+  Host: 127.0.0.1:6379
+  Pass: meeting
+  Type: node
+
 Jwt:
   AccessSecret: meeting
   AccessExpire: 8640000
@@ -9,3 +14,21 @@ Jwt:
 MongoDB:
   URL: "mongodb://root:meeting@127.0.0.1:47017"
   Db: chat
+
+KafkaPusherConf:
+  Brokers:
+    - "127.0.0.1:9092"
+  Topic:
+    - meeting
+    - social
+    - ws
+
+KafkaConsumerConf:
+  Name: ws
+  Brokers:
+    - "127.0.0.1:9092"
+  Group: wsConsumer
+  Topic: ws
+  Offset: first
+  Consumers: 8
+  Processor: 8

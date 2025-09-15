@@ -5,6 +5,7 @@ import (
 	"GoMeeting/rpcs/ws/internal/server"
 	"flag"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/service"
 
 	"GoMeeting/rpcs/ws/internal/config"
 	"GoMeeting/rpcs/ws/internal/svc"
@@ -22,11 +23,17 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 
 	s := server.NewWsServer(ctx)
-
 	defer s.Stop()
 
 	// 服务启动时注册路由与处理函数
-	handler.RegisterHandlers(s, ctx)
+	handler.RegisterHandlers(s)
+
+	//统一管理消费者
+	serviceGroup := service.NewServiceGroup()
+	defer serviceGroup.Stop()
+	for _, consumer := range handler.Consumers(s) {
+		serviceGroup.Add(consumer)
+	}
 
 	fmt.Printf("Starting ws server at %s...\n", c.ListenOn)
 	s.Start()

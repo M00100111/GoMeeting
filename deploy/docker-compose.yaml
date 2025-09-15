@@ -17,7 +17,7 @@ services:
       - ${DATA_HOST}/etcd/logs:/bitnami/etcd/logs
     networks:
       meeting:
-    restart: always
+    restart: ${RUN_MODE}
     environment:
       - TZ=${TZ} # 设置时区
       - ALLOW_NONE_AUTHENTICATION=yes # 允许没有密码的访问
@@ -35,8 +35,8 @@ services:
       - ${DATA_HOST}/mysql/data:/var/lib/mysql #设置数据库目录映射
       - /etc/localtime:/etc/localtime # 设置时区
     networks:
-      - meeting # 添加到mall网络
-    restart: always # 服务启动后，自动重启
+      - meeting # 添加到网络
+    restart: ${RUN_MODE} # 服务启动后，自动重启
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD} # 设置root密码
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci # 启动命令,设置字符集和字符集比较规则
@@ -52,10 +52,59 @@ services:
       - ${DATA_HOST}/redis/config/redis.conf:/usr/local/redis/config/redis.conf
     environment:
       TZ: Asia/Shanghai
-    restart: always
+    restart: ${RUN_MODE}
     networks:
       - meeting
     command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: meeting_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: meeting
+    ports:
+      - "7017:7017"
+    volumes:
+      - ./components/mongo/data:/data/db
+      - /etc/localtime:/etc/localtime
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: meeting_zookeeper
+    ports:
+      - 2181:2181
+    volumes:
+      - /etc/localtime:/etc/localtime
+    environment:
+      TZ: ${TZ}
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: meeting_kafka
+    ports:
+      - 9092:9092
+    restart: ${RUN_MODE}
+    environment:
+      TZ: ${TZ}
+      KAFKA_BROKER_ID: 0  # 集群节点ID
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # 集群节点注册容器地址
+      KAFKA_LISTENERS: INSIDE://:9092 # Kafka 监听的地址和端口
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT"  # 监听器安全协议映射
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://127.0.0.1:9092 # 对外公布的协议和监听地址
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE  # 指定 Kafka 集群内部 Broker 之间通信使用的协议
+      KAFKA_HEAP_OPTS: "-Xmx512M -Xms256M" # Kafka Broker 内存管理
+      KAFKA_CREATE_TOPICS: "meeting:8:1,social:8:1,ws:8:1" #主题:分区数:副本数
+    depends_on:
+      - zookeeper
+    networks:
+      meeting:
 
   #分布式事务解决方案DTM
 #  dtm:

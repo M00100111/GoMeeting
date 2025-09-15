@@ -4,12 +4,19 @@ import (
 	code "GoMeeting/pkg/result"
 	"GoMeeting/rpcs/social/models"
 	"GoMeeting/rpcs/social/rpc/internal/config"
-	"GoMeeting/rpcs/social/rpc/internal/logic"
 	"GoMeeting/rpcs/social/rpc/social"
 	"context"
 	"errors"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
+
+type GroupMemberLogic interface {
+	CreateGroupMember(ctx context.Context, req *social.CreateGroupMemberReq) (*social.CreateGroupMemberResp, error)
+}
+
+type GroupMemberRequestLogic interface {
+	CreateGroupMemberRequest(ctx context.Context, req *social.CreateGroupMemberRequestReq) (*social.CreateGroupMemberRequestResp, error)
+}
 
 type ServiceContext struct {
 	Config config.Config
@@ -18,6 +25,10 @@ type ServiceContext struct {
 	models.GroupsModel
 	models.GroupMembersModel
 	models.GroupRequestsModel
+
+	// 添加 Logic 接口
+	GroupMemberLogic        GroupMemberLogic
+	GroupMemberRequestLogic GroupMemberRequestLogic
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -39,9 +50,7 @@ func (s *ServiceContext) CallCreateGroupMember(ctx context.Context, groupIndex, 
 		GroupIndex: groupIndex,
 		UserIndex:  userIndex,
 	}
-	// 创建 CreateFriendLogic 实例并调用
-	createLogic := logic.NewCreateGroupMemberLogic(ctx, s)
-	createResult, err := createLogic.CreateGroupMember(creatReq)
+	createResult, err := s.GroupMemberLogic.CreateGroupMember(ctx, creatReq)
 	if err != nil {
 		return err
 	}
@@ -61,8 +70,7 @@ func (s *ServiceContext) CallCreateGroupMemberRequest(ctx context.Context, group
 		ReqMsg:     reqMsg,
 	}
 	// 创建 CreateGroupMemberRequestLogic 实例并调用
-	createLogic := logic.NewCreateGroupMemberRequestLogic(ctx, s)
-	createResult, err := createLogic.CreateGroupMemberRequest(creatReq)
+	createResult, err := s.GroupMemberRequestLogic.CreateGroupMemberRequest(ctx, creatReq)
 	if err != nil {
 		return err
 	}
