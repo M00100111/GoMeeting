@@ -70,13 +70,16 @@ func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.
 	//当会议已开始但用户为会议主持人则跳转到申请入会请求，上面已鉴权
 	if meetingInfo.Status == 1 {
 		//申请入会,修改当前人的入会信息
-		err = joinMeeting(l, in.MeetingId, in.UserIndex, in.UserId, in.Password)
+		err = joinMeeting(l, in.MeetingId, in.UserIndex, in.UserId, in.Password, in.Username, in.Email, in.Sex, in.MicStatus, in.CameraStatus, in.ScreenStatus)
 		if err != nil {
 			return &meeting.Result{
 				Code: code.SYS_ERRORCode,
 				Msg:  "调用本地JoinMeeting加入会议失败",
 			}, nil
 		}
+		return &meeting.Result{
+			Code: code.SUCCESSCode,
+		}, nil
 	}
 
 	//开启会议查询是否有以当前人为房主的进行中的其他会议
@@ -138,7 +141,7 @@ func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.
 	}
 
 	//申请入会,修改当前人的入会信息
-	err = joinMeeting(l, in.MeetingId, in.UserIndex, in.UserId, in.Password)
+	err = joinMeeting(l, in.MeetingId, in.UserIndex, in.UserId, in.Password, in.Username, in.Email, in.Sex, in.MicStatus, in.CameraStatus, in.ScreenStatus)
 	if err != nil {
 		return &meeting.Result{
 			Code: code.SYS_ERRORCode,
@@ -151,13 +154,19 @@ func (l *StartMeetingLogic) StartMeeting(in *meeting.StartMeetingReq) (*meeting.
 }
 
 // 调用同一个服务内的 JoinMeeting 方法
-func joinMeeting(l *StartMeetingLogic, meetingId, userIndex, userId uint64, meetingPassword string) error {
+func joinMeeting(l *StartMeetingLogic, meetingId, userIndex, userId uint64, meetingPassword, username, email string, sex, micStatus, cameraStatus, screenStatus uint64) error {
 	// 调用同一个服务内的 JoinMeeting 方法
 	joinReq := &meeting.JoinMeetingReq{
-		UserIndex: userIndex,
-		UserId:    userId,
-		MeetingId: meetingId,
-		Password:  meetingPassword,
+		UserIndex:    userIndex,
+		UserId:       userId,
+		MeetingId:    meetingId,
+		Password:     meetingPassword,
+		Username:     username,
+		Sex:          sex,
+		Email:        email,
+		MicStatus:    micStatus,
+		CameraStatus: cameraStatus,
+		ScreenStatus: screenStatus,
 	}
 	// 创建 JoinMeetingLogic 实例并调用
 	joinLogic := NewJoinMeetingLogic(l.ctx, l.svcCtx)

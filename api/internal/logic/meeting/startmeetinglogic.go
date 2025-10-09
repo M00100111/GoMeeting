@@ -34,28 +34,32 @@ func (l *StartMeetingLogic) StartMeeting(req *types.StartMeetingReq) (resp *type
 	if req.MeetingId == 0 || req.MeetingName == "" || (req.JoinType == 0 && req.Password != "") || (req.JoinType == 1 && len(req.Password) != 5) {
 		return types.NewErrorResultWithCode(code.ParamErrorCode), nil
 	}
+
 	//调用RPC服务
-	result, err := l.svcCtx.UserRpc.GetIndexByUserId(l.ctx, &user.GetIndexByUserIdReq{
+	result, err := l.svcCtx.UserRpc.GetUserInfoByUserId(l.ctx, &user.GetUserInfoByUserIdReq{
 		UserId: req.UserId,
 	})
-	//系统错误
 	if err != nil {
-		// 记录错误日志
 		l.Logger.Errorf("UserRpc.GetIndexByUserId error: %v, stack: %s", err, debug.Stack())
 		return types.NewSystemErrorResult(), nil
 	}
-	//业务错误
 	if result.Code != code.SUCCESSCode {
 		return types.NewErrorRpcResult(result), nil
 	}
 
 	result2, err := l.svcCtx.MeetingRpc.StartMeeting(l.ctx, &meeting.StartMeetingReq{
-		UserIndex:   result.Index,
-		UserId:      req.UserId,
-		MeetingId:   req.MeetingId,
-		MeetingName: req.MeetingName,
-		JoinType:    req.JoinType,
-		Password:    req.Password,
+		UserIndex:    result.UserInfo.Index,
+		UserId:       req.UserId,
+		MeetingId:    req.MeetingId,
+		MeetingName:  req.MeetingName,
+		JoinType:     req.JoinType,
+		Password:     req.Password,
+		Username:     result.UserInfo.Username,
+		Sex:          result.UserInfo.Sex,
+		Email:        result.UserInfo.Email,
+		MicStatus:    req.MicStatus,
+		CameraStatus: req.CameraStatus,
+		ScreenStatus: req.ScreenStatus,
 	})
 	//系统错误
 	if err != nil {

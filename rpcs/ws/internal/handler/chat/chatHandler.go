@@ -11,7 +11,7 @@ import (
 
 func ChatHandler() server.WsHandlerFunc {
 	return func(s *server.WsServer, msg *message.Message) error {
-		var chatMsg message.ChatMessage
+		var chatMsg message.ChatData
 		if err := json.Unmarshal(msg.Data, &chatMsg); err != nil {
 			s.Logger.Errorf("Failed to unmarshal message.Data to message.ChatMessage: %v", err)
 			return err

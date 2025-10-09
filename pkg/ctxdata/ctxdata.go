@@ -7,7 +7,7 @@ const (
 	MeetingOngoingPrefix      = "meeting:Ongoing:"
 	MeetingMemberPrefix       = "meeting:Member:%d"
 	GroupMemberPrefix         = "group:Member:%v"
-	MeetingMemberDetailPrefix = "meeting:MemberDetail:%d"
+	MeetingMemberDetailPrefix = "meeting:MemberDetail:%v"
 )
 
 const (

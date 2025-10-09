@@ -8,12 +8,6 @@ type LoginReq struct {
 	Password string `json:"password"`
 	Captcha  string `json:"captcha"`
 }
-type LoginResp struct {
-	Token  string `json:"token"`
-	Expire int64  `json:"expire"`
-	UserId int64  `json:"user_id"`
-	Msg    string `json:"msg"`
-}
 
 type SignUpReq struct {
 	Email    string `json:"email"`

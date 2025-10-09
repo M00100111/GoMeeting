@@ -14,14 +14,17 @@ import (
 )
 
 type (
-	GetIndexByUserIdReq  = user.GetIndexByUserIdReq
-	GetIndexByUserIdResp = user.GetIndexByUserIdResp
-	LoginReq             = user.LoginReq
-	LoginResp            = user.LoginResp
-	PingReq              = user.PingReq
-	PingResp             = user.PingResp
-	SignUpReq            = user.SignUpReq
-	SignUpResp           = user.SignUpResp
+	GetIndexByUserIdReq     = user.GetIndexByUserIdReq
+	GetIndexByUserIdResp    = user.GetIndexByUserIdResp
+	GetUserInfoByUserIdReq  = user.GetUserInfoByUserIdReq
+	GetUserInfoByUserIdResp = user.GetUserInfoByUserIdResp
+	LoginReq                = user.LoginReq
+	LoginResp               = user.LoginResp
+	PingReq                 = user.PingReq
+	PingResp                = user.PingResp
+	SignUpReq               = user.SignUpReq
+	SignUpResp              = user.SignUpResp
+	UserInfo                = user.UserInfo
 
 	User interface {
 		// 定义功能及请求与响应结构体
@@ -29,6 +32,7 @@ type (
 		SignUp(ctx context.Context, in *SignUpReq, opts ...grpc.CallOption) (*SignUpResp, error)
 		Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
 		GetIndexByUserId(ctx context.Context, in *GetIndexByUserIdReq, opts ...grpc.CallOption) (*GetIndexByUserIdResp, error)
+		GetUserInfoByUserId(ctx context.Context, in *GetUserInfoByUserIdReq, opts ...grpc.CallOption) (*GetUserInfoByUserIdResp, error)
 	}
 
 	defaultUser struct {
@@ -61,4 +65,9 @@ func (m *defaultUser) Login(ctx context.Context, in *LoginReq, opts ...grpc.Call
 func (m *defaultUser) GetIndexByUserId(ctx context.Context, in *GetIndexByUserIdReq, opts ...grpc.CallOption) (*GetIndexByUserIdResp, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetIndexByUserId(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetUserInfoByUserId(ctx context.Context, in *GetUserInfoByUserIdReq, opts ...grpc.CallOption) (*GetUserInfoByUserIdResp, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetUserInfoByUserId(ctx, in, opts...)
 }

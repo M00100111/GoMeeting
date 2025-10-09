@@ -1,8 +1,14 @@
 package structs
 
 type MemberStatus struct {
-	MemberId     uint64
-	Status       uint64 //0正常1网络不佳2掉线3禁言
+	UserId   string
+	Username string
+	Sex      uint64
+	Email    string
+
+	UserStatus uint64
+	UserType   uint64
+
 	MicStatus    uint64 //0关1开
 	CameraStatus uint64
 	ScreenStatus uint64

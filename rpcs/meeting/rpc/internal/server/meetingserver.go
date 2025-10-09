@@ -57,3 +57,8 @@ func (s *MeetingServer) LeaveMeeting(ctx context.Context, in *meeting.LeaveMeeti
 	l := logic.NewLeaveMeetingLogic(ctx, s.svcCtx)
 	return l.LeaveMeeting(in)
 }
+
+func (s *MeetingServer) GetMeetingInfo(ctx context.Context, in *meeting.GetMeetingInfoReq) (*meeting.GetMeetingInfoResp, error) {
+	l := logic.NewGetMeetingInfoLogic(ctx, s.svcCtx)
+	return l.GetMeetingInfo(in)
+}

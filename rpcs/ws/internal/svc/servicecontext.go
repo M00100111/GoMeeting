@@ -2,6 +2,7 @@ package svc
 
 import (
 	"GoMeeting/rpcs/ws/internal/config"
+	"github.com/segmentio/kafka-go"
 	"github.com/zeromicro/go-queue/kq"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 )
@@ -9,13 +10,28 @@ import (
 type ServiceContext struct {
 	Config config.Config
 	*redis.Redis
-	KafkaPusher *kq.Pusher // 生产者
+	KafkaMeetingPusher *kq.Pusher // 生产者
+	KafkaSocialPusher  *kq.Pusher // 生产者
+	KafkaWsPusher      *kq.Pusher // 生产者
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
-		Config:      c,
-		Redis:       redis.MustNewRedis(c.Redis),
-		KafkaPusher: kq.NewPusher(c.KafkaPusherConf.Brokers, c.KafkaPusherConf.Topic),
+		Config:             c,
+		Redis:              redis.MustNewRedis(c.Redis),
+		KafkaMeetingPusher: kq.NewPusher(c.KafkaPusherConf.Brokers, c.KafkaPusherConf.Topic[0]),
+		KafkaSocialPusher:  kq.NewPusher(c.KafkaPusherConf.Brokers, c.KafkaPusherConf.Topic[1]),
+		KafkaWsPusher:      kq.NewPusher(c.KafkaPusherConf.Brokers, c.KafkaPusherConf.Topic[2]),
 	}
+}
+
+// 创建消费者构建器
+func (s *ServiceContext) CreateKafkaConsumer() *kafka.Reader {
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  s.Config.KafkaConsumerConf.Brokers,
+		GroupID:  s.Config.KafkaConsumerConf.Group,
+		Topic:    s.Config.KafkaConsumerConf.Topic,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+	})
 }

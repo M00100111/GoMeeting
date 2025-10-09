@@ -8,6 +8,18 @@ type EndMeetingReq struct {
 	MeetingId uint64 `json:"meetingId"`
 }
 
+type GetMeetingInfoReq struct {
+	UserId uint64 `json:"-"`
+}
+
+type GetMeetingMembersInfoReq struct {
+	UserId uint64 `json:"-"`
+}
+
+type GetMeetingMembersReq struct {
+	UserId uint64 `json:"-"`
+}
+
 type JoinMeetingReq struct {
 	UserId       uint64 `json:"-"` // 服务端填充，不在客户端 JSON 中
 	MeetingId    uint64 `json:"meetingId"`
@@ -22,10 +34,17 @@ type LeaveMeetingReq struct {
 	MeetingId uint64 `json:"meetingId"`
 }
 
+type PingReq struct {
+	Msg string `json:"msg"`
+}
+
 type StartMeetingReq struct {
-	UserId      uint64 `json:"-"` // 服务端填充，不在客户端 JSON 中
-	MeetingId   uint64 `json:"meetingId"`
-	MeetingName string `json:"meetingName"`
-	JoinType    uint64 `json:"joinType"` // 0: 开放 1: 密码
-	Password    string `json:"password"`
+	UserId       uint64 `json:"-"` // 服务端填充，不在客户端 JSON 中
+	MeetingId    uint64 `json:"meetingId"`
+	MeetingName  string `json:"meetingName"`
+	JoinType     uint64 `json:"joinType"` // 0: 开放 1: 密码
+	Password     string `json:"password"`
+	MicStatus    uint64 `json:"micStatus"`
+	CameraStatus uint64 `json:"cameraStatus"`
+	ScreenStatus uint64 `json:"screenStatus"`
 }

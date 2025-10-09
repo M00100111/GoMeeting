@@ -6,7 +6,6 @@ type(
         Msg string  `json:"msg"`
         Data interface{} `json:"data"`
     }
-
     PingReq{
         Msg string `json:"msg"`
     }

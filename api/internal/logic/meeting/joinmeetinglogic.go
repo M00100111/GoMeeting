@@ -1,15 +1,14 @@
 package meeting
 
 import (
+	"GoMeeting/api/internal/svc"
+	"GoMeeting/api/internal/types"
 	code "GoMeeting/pkg/result"
 	"GoMeeting/rpcs/meeting/rpc/meeting"
 	"GoMeeting/rpcs/user/rpc/user"
 	"context"
 	"fmt"
 	"runtime/debug"
-
-	"GoMeeting/api/internal/svc"
-	"GoMeeting/api/internal/types"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,7 +33,7 @@ func (l *JoinMeetingLogic) JoinMeeting(req *types.JoinMeetingReq) (resp *types.R
 		return types.NewErrorResultWithCode(code.ParamErrorCode), nil
 	}
 	//调用RPC服务
-	result, err := l.svcCtx.UserRpc.GetIndexByUserId(l.ctx, &user.GetIndexByUserIdReq{
+	result, err := l.svcCtx.UserRpc.GetUserInfoByUserId(l.ctx, &user.GetUserInfoByUserIdReq{
 		UserId: req.UserId,
 	})
 	if err != nil {
@@ -46,10 +45,13 @@ func (l *JoinMeetingLogic) JoinMeeting(req *types.JoinMeetingReq) (resp *types.R
 	}
 
 	result2, err := l.svcCtx.MeetingRpc.JoinMeeting(l.ctx, &meeting.JoinMeetingReq{
-		UserIndex:    result.Index,
+		UserIndex:    result.UserInfo.Index,
 		UserId:       req.UserId,
 		MeetingId:    req.MeetingId,
 		Password:     req.Password,
+		Username:     result.UserInfo.Username,
+		Sex:          result.UserInfo.Sex,
+		Email:        result.UserInfo.Email,
 		MicStatus:    req.MicStatus,
 		CameraStatus: req.CameraStatus,
 		ScreenStatus: req.ScreenStatus,
@@ -62,5 +64,6 @@ func (l *JoinMeetingLogic) JoinMeeting(req *types.JoinMeetingReq) (resp *types.R
 	if result2.Code != code.SUCCESSCode {
 		return types.NewErrorRpcResult(result2), nil
 	}
+
 	return types.NewSuccessResult(), nil
 }

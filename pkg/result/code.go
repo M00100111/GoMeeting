@@ -58,10 +58,11 @@ const (
 )
 
 const (
-	ParamErrorCode = 400
+	ParamErrorCode = 400 + iota
+	ErrParamParseCode
 )
 
-const ( //参数错误
+const (
 	ErrDbOpCode = 1001 + iota
 	ErrRedisOpCode
 	ErrRecordNotExistCode
@@ -81,6 +82,7 @@ const (
 	CaptchaSendFailCode
 	UserPasswordErrorCode
 	UserNoPermissionCode
+	UserNotInMeetingCode
 )
 
 // 会议相关错误码
@@ -111,6 +113,7 @@ var (
 
 var (
 	ParamError         = RegisterCode(ParamErrorCode, "参数错误")
+	ErrParamParse      = RegisterCode(ErrParamParseCode, "参数解析错误")
 	ErrDbOp            = RegisterCode(ErrDbOpCode, "数据库操作异常")
 	ErrRedisOp         = RegisterCode(ErrRedisOpCode, "Redis操作异常")
 	ErrRecordNotExist  = RegisterCode(ErrRecordNotExistCode, "记录不存在")
@@ -131,6 +134,7 @@ var (
 	UserCaptchaFail     = RegisterCode(CaptchaErrorCode, "验证码错误")
 	UserCaptchaExpire   = RegisterCode(CaptchaExpireCode, "验证码已过期")
 	UserCaptchaSendFail = RegisterCode(CaptchaSendFailCode, "验证码发送失败")
+	UserNotInMeeting    = RegisterCode(UserNotInMeetingCode, "用户不在会议中")
 )
 
 // 会议相关错误信息

@@ -26,6 +26,7 @@ const (
 	Meeting_AppointmentMeeting_FullMethodName = "/meeting.Meeting/AppointmentMeeting"
 	Meeting_JoinMeeting_FullMethodName        = "/meeting.Meeting/JoinMeeting"
 	Meeting_LeaveMeeting_FullMethodName       = "/meeting.Meeting/LeaveMeeting"
+	Meeting_GetMeetingInfo_FullMethodName     = "/meeting.Meeting/GetMeetingInfo"
 )
 
 // MeetingClient is the client API for Meeting service.
@@ -41,6 +42,7 @@ type MeetingClient interface {
 	AppointmentMeeting(ctx context.Context, in *AppointmentMeetingReq, opts ...grpc.CallOption) (*Result, error)
 	JoinMeeting(ctx context.Context, in *JoinMeetingReq, opts ...grpc.CallOption) (*Result, error)
 	LeaveMeeting(ctx context.Context, in *LeaveMeetingReq, opts ...grpc.CallOption) (*Result, error)
+	GetMeetingInfo(ctx context.Context, in *GetMeetingInfoReq, opts ...grpc.CallOption) (*GetMeetingInfoResp, error)
 }
 
 type meetingClient struct {
@@ -121,6 +123,16 @@ func (c *meetingClient) LeaveMeeting(ctx context.Context, in *LeaveMeetingReq, o
 	return out, nil
 }
 
+func (c *meetingClient) GetMeetingInfo(ctx context.Context, in *GetMeetingInfoReq, opts ...grpc.CallOption) (*GetMeetingInfoResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMeetingInfoResp)
+	err := c.cc.Invoke(ctx, Meeting_GetMeetingInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MeetingServer is the server API for Meeting service.
 // All implementations must embed UnimplementedMeetingServer
 // for forward compatibility.
@@ -134,6 +146,7 @@ type MeetingServer interface {
 	AppointmentMeeting(context.Context, *AppointmentMeetingReq) (*Result, error)
 	JoinMeeting(context.Context, *JoinMeetingReq) (*Result, error)
 	LeaveMeeting(context.Context, *LeaveMeetingReq) (*Result, error)
+	GetMeetingInfo(context.Context, *GetMeetingInfoReq) (*GetMeetingInfoResp, error)
 	mustEmbedUnimplementedMeetingServer()
 }
 
@@ -164,6 +177,9 @@ func (UnimplementedMeetingServer) JoinMeeting(context.Context, *JoinMeetingReq) 
 }
 func (UnimplementedMeetingServer) LeaveMeeting(context.Context, *LeaveMeetingReq) (*Result, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LeaveMeeting not implemented")
+}
+func (UnimplementedMeetingServer) GetMeetingInfo(context.Context, *GetMeetingInfoReq) (*GetMeetingInfoResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMeetingInfo not implemented")
 }
 func (UnimplementedMeetingServer) mustEmbedUnimplementedMeetingServer() {}
 func (UnimplementedMeetingServer) testEmbeddedByValue()                 {}
@@ -312,6 +328,24 @@ func _Meeting_LeaveMeeting_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Meeting_GetMeetingInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMeetingInfoReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MeetingServer).GetMeetingInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Meeting_GetMeetingInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MeetingServer).GetMeetingInfo(ctx, req.(*GetMeetingInfoReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Meeting_ServiceDesc is the grpc.ServiceDesc for Meeting service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -346,6 +380,10 @@ var Meeting_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LeaveMeeting",
 			Handler:    _Meeting_LeaveMeeting_Handler,
+		},
+		{
+			MethodName: "GetMeetingInfo",
+			Handler:    _Meeting_GetMeetingInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -23,7 +23,7 @@ type Config struct {
 
 	KafkaPusherConf struct {
 		Brokers []string
-		Topic   string
+		Topic   []string
 	}
 	KafkaConsumerConf kq.KqConf
 }

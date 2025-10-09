@@ -43,3 +43,8 @@ func (s *UserServer) GetIndexByUserId(ctx context.Context, in *user.GetIndexByUs
 	l := logic.NewGetIndexByUserIdLogic(ctx, s.svcCtx)
 	return l.GetIndexByUserId(in)
 }
+
+func (s *UserServer) GetUserInfoByUserId(ctx context.Context, in *user.GetUserInfoByUserIdReq) (*user.GetUserInfoByUserIdResp, error) {
+	l := logic.NewGetUserInfoByUserIdLogic(ctx, s.svcCtx)
+	return l.GetUserInfoByUserId(in)
+}

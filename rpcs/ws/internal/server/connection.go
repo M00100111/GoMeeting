@@ -1,6 +1,8 @@
 package server
 
 import (
+	"GoMeeting/rpcs/ws/internal/message"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"sync"
@@ -22,7 +24,7 @@ type WsConn struct {
 	lastActiveTime      time.Time //最后一次活跃时间
 
 	//用于通信的管道
-	//Message chan *message.Message
+	Message chan *message.Message
 }
 
 // 将当前客户端的http连接升级为websocket连接
@@ -39,6 +41,7 @@ func NewWsConn(s *WsServer, w http.ResponseWriter, r *http.Request, uid string) 
 		Conn:           c,
 		Uid:            uid,
 		Done:           make(chan struct{}),
+		Message:        make(chan *message.Message, 1),
 		lastActiveTime: time.Now(),
 	}
 	//闲置连接回收
@@ -110,6 +113,7 @@ func (c *WsConn) keepalive() {
 
 // 关闭Ws连接
 func (c *WsConn) CloseWsConn() error {
+	fmt.Println("关闭Ws连接")
 	//停止与客户端的心跳
 	//避免关闭已关闭的通道
 	select {

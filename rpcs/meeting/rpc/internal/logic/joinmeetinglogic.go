@@ -97,6 +97,13 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 				Msg:  "新增会议成员信息失败",
 			}, nil
 		}
+		meetingMember, err = l.svcCtx.MeetingMemberModel.FindOneByMeetingIdUserId(l.ctx, meetingInfo.Id, in.UserIndex)
+		//数据库操作出错
+		if err != nil && err != sqlc.ErrNotFound {
+			return &meeting.Result{
+				Code: code.ErrDbOpCode,
+			}, nil
+		}
 	} else {
 		//判断是否被拉黑
 		if meetingMember.UserStatus != 0 {
@@ -120,7 +127,7 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 
 	// 将会议室成员id和状态信息分别添加到Redis
 
-	// 存储成员Index到 Redis Hash (成员ID -> 会议ID)
+	// 记录系统中正在开会的用户，存储成员Id到 Redis Hash (成员ID -> 会议ID)
 	err = l.svcCtx.Redis.HsetCtx(l.ctx, ctxdata.OnMeetingUserPrefix, strconv.FormatUint(in.UserId, 10), strconv.FormatUint(in.MeetingId, 10))
 	if err != nil {
 		l.Logger.Errorf("Failed to store member ID in RedisHash: %v", err)
@@ -129,7 +136,7 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 		}, nil
 	}
 
-	// 存储成员Index到 Redis List
+	// 记录在会议中的用户，存储成员Id到 Redis Set
 	memberSetKey := fmt.Sprintf(ctxdata.MeetingMemberPrefix, in.MeetingId)
 	val, err := l.svcCtx.Redis.SaddCtx(l.ctx, memberSetKey, in.UserId)
 	if err != nil {
@@ -145,10 +152,15 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 		}, nil
 	}
 
-	// 存储成员状态到 Redis Hash
+	//存储成员信息到 Redis Hash
 	memberStatusKey := fmt.Sprintf(ctxdata.MeetingMemberDetailPrefix, in.MeetingId)
 	memberStatus := structs.MemberStatus{
-		MemberId:     in.UserId,
+		UserId:       strconv.FormatUint(in.UserId, 10),
+		Username:     in.Username,
+		Sex:          in.Sex,
+		Email:        in.Email,
+		UserStatus:   meetingMember.UserStatus,
+		UserType:     meetingMember.UserType,
 		MicStatus:    in.MicStatus,
 		CameraStatus: in.CameraStatus,
 		ScreenStatus: in.ScreenStatus,

@@ -36,6 +36,21 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: meeting.EndMeetingHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodGet,
+					Path:    "/getmeetinginfo",
+					Handler: meeting.GetMeetingInfoHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/getmeetingmembers",
+					Handler: meeting.GetMeetingMembersHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/getmeetingmembersinfo",
+					Handler: meeting.GetMeetingMembersInfoHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPost,
 					Path:    "/joinmeeting",
 					Handler: meeting.JoinMeetingHandler(serverCtx),
@@ -59,7 +74,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				// 申请生成验证码发送到邮箱并存入Redis
-				Method:  http.MethodGet,
+				Method:  http.MethodPost,
 				Path:    "/captcha",
 				Handler: tool.GenerateCaptchaHandler(serverCtx),
 			},

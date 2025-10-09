@@ -1,7 +1,5 @@
 syntax= "v1"
 
-
-
 type(
     CaptchaReq{
         Email string `json:"email"`

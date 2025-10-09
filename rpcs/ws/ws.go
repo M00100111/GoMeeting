@@ -31,9 +31,11 @@ func main() {
 	//统一管理消费者
 	serviceGroup := service.NewServiceGroup()
 	defer serviceGroup.Stop()
-	for _, consumer := range handler.Consumers(s) {
+	for _, consumer := range server.Consumers(s) {
 		serviceGroup.Add(consumer)
 	}
+	// 在单独的goroutine中启动服务组，避免阻塞
+	go serviceGroup.Start()
 
 	fmt.Printf("Starting ws server at %s...\n", c.ListenOn)
 	s.Start()

@@ -17,6 +17,8 @@ type (
 	AppointmentMeetingReq = meeting.AppointmentMeetingReq
 	CreateMeetingReq      = meeting.CreateMeetingReq
 	EndMeetingReq         = meeting.EndMeetingReq
+	GetMeetingInfoReq     = meeting.GetMeetingInfoReq
+	GetMeetingInfoResp    = meeting.GetMeetingInfoResp
 	JoinMeetingReq        = meeting.JoinMeetingReq
 	LeaveMeetingReq       = meeting.LeaveMeetingReq
 	PingReq               = meeting.PingReq
@@ -31,6 +33,7 @@ type (
 		AppointmentMeeting(ctx context.Context, in *AppointmentMeetingReq, opts ...grpc.CallOption) (*Result, error)
 		JoinMeeting(ctx context.Context, in *JoinMeetingReq, opts ...grpc.CallOption) (*Result, error)
 		LeaveMeeting(ctx context.Context, in *LeaveMeetingReq, opts ...grpc.CallOption) (*Result, error)
+		GetMeetingInfo(ctx context.Context, in *GetMeetingInfoReq, opts ...grpc.CallOption) (*GetMeetingInfoResp, error)
 	}
 
 	defaultMeeting struct {
@@ -77,4 +80,9 @@ func (m *defaultMeeting) JoinMeeting(ctx context.Context, in *JoinMeetingReq, op
 func (m *defaultMeeting) LeaveMeeting(ctx context.Context, in *LeaveMeetingReq, opts ...grpc.CallOption) (*Result, error) {
 	client := meeting.NewMeetingClient(m.cli.Conn())
 	return client.LeaveMeeting(ctx, in, opts...)
+}
+
+func (m *defaultMeeting) GetMeetingInfo(ctx context.Context, in *GetMeetingInfoReq, opts ...grpc.CallOption) (*GetMeetingInfoResp, error) {
+	client := meeting.NewMeetingClient(m.cli.Conn())
+	return client.GetMeetingInfo(ctx, in, opts...)
 }

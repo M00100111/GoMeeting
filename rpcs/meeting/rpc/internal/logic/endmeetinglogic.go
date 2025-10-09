@@ -5,6 +5,8 @@ import (
 	code "GoMeeting/pkg/result"
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"strconv"
 	"time"
@@ -102,7 +104,63 @@ func (l *EndMeetingLogic) EndMeeting(in *meeting.EndMeetingReq) (*meeting.Result
 		}, nil
 	}
 
+	//成员批量退会
+	err = allLeaveMeeting(l, in.MeetingId)
+	if err != nil {
+		return &meeting.Result{
+			Code: code.MeetingEndFailCode,
+			Msg:  "成员批量退会失败",
+		}, nil
+	}
+
 	return &meeting.Result{
 		Code: code.SUCCESSCode,
 	}, nil
+}
+
+func allLeaveMeeting(l *EndMeetingLogic, meetingId uint64) error {
+	// 获取指定会议的所有成员ID
+	memberSetKey := fmt.Sprintf(ctxdata.MeetingMemberPrefix, meetingId)
+	members, err := l.svcCtx.Redis.SmembersCtx(l.ctx, memberSetKey)
+	if err != nil {
+		l.Logger.Errorf("从Redis获取会议成员ID失败: %v", err)
+		return err
+	}
+	for _, memberIdStr := range members {
+		// 调用同一个服务内的 LeaveMeeting 方法
+		// 将字符串转换为 uint64
+		memberId, err := strconv.ParseUint(memberIdStr, 10, 64)
+		if err != nil {
+			l.Logger.Errorf("成员ID转换失败: %v", err)
+			return err
+		}
+		err = leaveMeeting(l, meetingId, memberId)
+		if err != nil {
+			l.Logger.Errorf("调用RPC本地LeaveMeeting 批量退会失败: %v", err)
+			return err
+		}
+	}
+	return nil
+}
+
+// 调用同一个服务内的 LeaveMeeting 方法
+func leaveMeeting(l *EndMeetingLogic, meetingId uint64, userId uint64) error {
+	// 调用同一个服务内的 JoinMeeting 方法
+	leaveReq := &meeting.LeaveMeetingReq{
+		UserId:    userId,
+		MeetingId: meetingId,
+	}
+	// 创建 JoinMeetingLogic 实例并调用
+	leaveLogic := NewLeaveMeetingLogic(l.ctx, l.svcCtx)
+	leaveResult, err := leaveLogic.LeaveMeeting(leaveReq)
+	if err != nil {
+		l.Logger.Errorf("调用RPC本地LeaveMeeting 失败: %v", err)
+		return err
+	}
+	// 检查加入会议的结果
+	if leaveResult.Code != code.SUCCESSCode {
+		l.Logger.Errorf("调用RPC本地LeaveMeeting离开会议失败: %v", err)
+		return errors.New("调用RPC本地JoinMeeting离开会议失败")
+	}
+	return nil
 }

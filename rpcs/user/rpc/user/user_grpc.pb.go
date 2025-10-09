@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Ping_FullMethodName             = "/user.User/Ping"
-	User_SignUp_FullMethodName           = "/user.User/SignUp"
-	User_Login_FullMethodName            = "/user.User/Login"
-	User_GetIndexByUserId_FullMethodName = "/user.User/GetIndexByUserId"
+	User_Ping_FullMethodName                = "/user.User/Ping"
+	User_SignUp_FullMethodName              = "/user.User/SignUp"
+	User_Login_FullMethodName               = "/user.User/Login"
+	User_GetIndexByUserId_FullMethodName    = "/user.User/GetIndexByUserId"
+	User_GetUserInfoByUserId_FullMethodName = "/user.User/GetUserInfoByUserId"
 )
 
 // UserClient is the client API for User service.
@@ -36,6 +37,7 @@ type UserClient interface {
 	SignUp(ctx context.Context, in *SignUpReq, opts ...grpc.CallOption) (*SignUpResp, error)
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginResp, error)
 	GetIndexByUserId(ctx context.Context, in *GetIndexByUserIdReq, opts ...grpc.CallOption) (*GetIndexByUserIdResp, error)
+	GetUserInfoByUserId(ctx context.Context, in *GetUserInfoByUserIdReq, opts ...grpc.CallOption) (*GetUserInfoByUserIdResp, error)
 }
 
 type userClient struct {
@@ -86,6 +88,16 @@ func (c *userClient) GetIndexByUserId(ctx context.Context, in *GetIndexByUserIdR
 	return out, nil
 }
 
+func (c *userClient) GetUserInfoByUserId(ctx context.Context, in *GetUserInfoByUserIdReq, opts ...grpc.CallOption) (*GetUserInfoByUserIdResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserInfoByUserIdResp)
+	err := c.cc.Invoke(ctx, User_GetUserInfoByUserId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -97,6 +109,7 @@ type UserServer interface {
 	SignUp(context.Context, *SignUpReq) (*SignUpResp, error)
 	Login(context.Context, *LoginReq) (*LoginResp, error)
 	GetIndexByUserId(context.Context, *GetIndexByUserIdReq) (*GetIndexByUserIdResp, error)
+	GetUserInfoByUserId(context.Context, *GetUserInfoByUserIdReq) (*GetUserInfoByUserIdResp, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -118,6 +131,9 @@ func (UnimplementedUserServer) Login(context.Context, *LoginReq) (*LoginResp, er
 }
 func (UnimplementedUserServer) GetIndexByUserId(context.Context, *GetIndexByUserIdReq) (*GetIndexByUserIdResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetIndexByUserId not implemented")
+}
+func (UnimplementedUserServer) GetUserInfoByUserId(context.Context, *GetUserInfoByUserIdReq) (*GetUserInfoByUserIdResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoByUserId not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -212,6 +228,24 @@ func _User_GetIndexByUserId_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetUserInfoByUserId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserInfoByUserIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserInfoByUserId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetUserInfoByUserId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserInfoByUserId(ctx, req.(*GetUserInfoByUserIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -234,6 +268,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetIndexByUserId",
 			Handler:    _User_GetIndexByUserId_Handler,
+		},
+		{
+			MethodName: "GetUserInfoByUserId",
+			Handler:    _User_GetUserInfoByUserId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

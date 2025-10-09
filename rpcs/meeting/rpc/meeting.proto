@@ -11,6 +11,7 @@ service Meeting{
   rpc AppointmentMeeting(AppointmentMeetingReq) returns (Result);
   rpc JoinMeeting(JoinMeetingReq) returns (Result);
   rpc LeaveMeeting(LeaveMeetingReq) returns (Result);
+  rpc GetMeetingInfo(GetMeetingInfoReq) returns (GetMeetingInfoResp);
 //  rpc CancelMeeting(CancelMeetingReq) returns (Result);
 //  rpc UpdateMeeting(UpdateMeetingReq) returns (Result);
 }
@@ -47,6 +48,14 @@ message StartMeetingReq{
   string meetingName = 4;
   uint64 joinType = 5;
   string password = 6;
+
+  string username = 7;
+  uint64 sex = 8;
+  string email = 9;
+
+  uint64 MicStatus = 10;
+  uint64 CameraStatus = 11;
+  uint64 ScreenStatus = 12;
 }
 
 message JoinMeetingReq{
@@ -54,9 +63,14 @@ message JoinMeetingReq{
   uint64 userId = 2;
   uint64 meetingId = 3;
   string password = 4;
-  uint64 micStatus = 5;
-  uint64 cameraStatus = 6;
-  uint64 screenStatus = 7;
+
+  string username = 5;
+  uint64 sex = 6;
+  string email = 7;
+
+  uint64 MicStatus = 8;
+  uint64 CameraStatus = 9;
+  uint64 ScreenStatus = 10;
 }
 
 message LeaveMeetingReq{
@@ -74,4 +88,15 @@ message AppointmentMeetingReq{
   int64 startTime = 2;
 }
 
+message GetMeetingInfoReq{
+  uint64 meetingId = 1;
+}
 
+message GetMeetingInfoResp{
+  int32 code = 1;
+  string msg = 2;
+  uint64 meetingId = 3;
+  string meetingName = 4;
+  uint64 joinType = 5;
+  int64 startTime = 6;
+}

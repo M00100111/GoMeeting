@@ -5,6 +5,7 @@ import (
 	"GoMeeting/pkg/ctxdata"
 	code "GoMeeting/pkg/result"
 	"context"
+	"fmt"
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"net/http"
 	"strings"
@@ -25,6 +26,8 @@ func (m *JwtAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		// TODO generate middleware implement function, delete after code implementation
 		//获取Authorization头
 		authHeader := r.Header.Get("Authorization")
+		//fmt.Println("authHeader:")
+		fmt.Println(authHeader)
 		if authHeader == "" {
 			// 正常返回结果，提示认证失败
 			httpx.OkJson(w, types.NewErrorResultWithCodef(code.TokenErrorCode, "未传递Token"))

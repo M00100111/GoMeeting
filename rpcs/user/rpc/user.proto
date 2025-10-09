@@ -9,6 +9,7 @@ service User{
   rpc SignUp(SignUpReq) returns (SignUpResp);
   rpc Login(LoginReq) returns (LoginResp);
   rpc GetIndexByUserId(GetIndexByUserIdReq) returns (GetIndexByUserIdResp);
+  rpc GetUserInfoByUserId(GetUserInfoByUserIdReq) returns (GetUserInfoByUserIdResp);
 }
 
 message PingReq{
@@ -58,4 +59,21 @@ message GetIndexByUserIdResp{
   string msg = 2;
 
   uint64 index = 3;
+}
+
+message UserInfo{
+  uint64 index = 1;
+  uint64 userId = 2;
+  string email = 3;
+  string username = 4;
+  uint64 sex = 5;
+  uint64 status = 6;
+}
+message GetUserInfoByUserIdReq{
+  uint64 userId = 1;
+}
+message GetUserInfoByUserIdResp{
+  int32 code = 1;
+  string msg = 2;
+  UserInfo userInfo = 3;
 }

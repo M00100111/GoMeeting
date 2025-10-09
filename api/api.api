@@ -50,6 +50,15 @@ service api {
 
 	@handler leaveMeeting
 	post /leavemeeting (LeaveMeetingReq) returns (Result)
+
+	@handler getMeetingInfo
+	get /getmeetinginfo (GetMeetingInfoReq) returns (Result)
+
+	@handler getMeetingMembers
+	post /getmeetingmembers (GetMeetingMembersReq) returns (Result)
+
+	@handler getMeetingMembersInfo
+	post /getmeetingmembersinfo (GetMeetingMembersInfoReq) returns (Result)
 }
 
 @server (
@@ -59,6 +68,6 @@ service api {
 service api {
 	@doc "申请生成验证码发送到邮箱并存入Redis"
 	@handler generateCaptcha
-	get /captcha (CaptchaReq) returns (Result)
+	post /captcha (CaptchaReq) returns (Result)
 }
 

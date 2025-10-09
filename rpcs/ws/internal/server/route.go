@@ -5,7 +5,7 @@ import (
 )
 
 type Route struct {
-	Method  string
+	Method  message.MessageMethod
 	Handler WsHandlerFunc
 }
 

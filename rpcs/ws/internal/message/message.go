@@ -13,20 +13,22 @@ const (
 	Pong_Message
 	Notification_Message
 	Chat_Message
+	Error_Message
+	WebRTC_Message
 )
 
 type Message struct {
 	MessageType MessageType     `json:"message_type"`
-	Method      string          `json:"method"` //请求方法
+	Method      MessageMethod   `json:"method"` //请求方法
 	Data        json.RawMessage `json:"data"`   // 数据
 }
 
-type PingMessage struct {
+type PingData struct {
 	SenderId string `json:"sender_id"` //发送者id
 	Msg      string `json:"msg"`
 }
 
-type ChatMessage struct {
+type ChatData struct {
 	SenderId   string   `json:"sender_id"` //发送者id
 	ChatType   ChatType `json:"chat_type"`
 	ReceiverId string   `json:"receiver_id"`
@@ -51,10 +53,15 @@ const (
 	File_Msg
 )
 
-type NotificationMessage struct {
+type NotificationData struct {
 	ReceiverId string `json:"receiver_id"`
 	Msg        string `json:"msg"`
 }
+
+//type WebRTCData struct {
+//	SenderId   string `json:"sender_id"`
+//	ReceiverId string `json:"receiver_id"`
+//}
 
 type MessageMethod string
 
@@ -67,11 +74,19 @@ const (
 	Meeting_End_Notice_Method                        = "Meeting_End_Notification"
 	Meeting_Member_Join_Notice_Method                = "Meeting_Member_Join"
 	Meeting_Member_Leave_Notice_Method               = "Meeting_Member_Leave"
-	Meeting_Message_Notice_Method                    = "Meeting_Message_Leave"
-	Group_Member_Join_Notice_Method                  = "Meeting_Member_Join"
-	Group_Member_Leave_Notice_Method                 = "Meeting_Member_Leave"
-	Group_Message_Notice_Method                      = "Meeting_Member_Notice"
+	Meeting_Message_Method                           = "Meeting_Message"
+	//WebRTC_Method                                    = "WebRTC"
+	WebRTC_Offer_Method         = "Offer"
+	WebRTC_Answer_Method        = "Answer"
+	WebRTC_Ice_Candidate_Method = "Ice_Candidate"
+	WebRTC_User_Joined_Method   = "User_Joined"
+	WebRTC_User_Left_Method     = "User_Left"
+	WebRTC_Unknown              = "Unknown"
 )
+
+type ErrorData struct {
+	Msg string `json:"msg"`
+}
 
 // 解析conn接收到的二进制消息
 func ParseMessage(data []byte) (*Message, error) {

@@ -7,7 +7,3 @@ type CaptchaReq struct {
 	Email  string `json:"email"`
 	Expire int64  `json:"expire"`
 }
-
-type PingReq struct {
-	Msg string `json:"msg"`
-}
