@@ -4,6 +4,7 @@ import (
 	"GoMeeting/pkg/ctxdata"
 	code "GoMeeting/pkg/result"
 	"GoMeeting/pkg/structs"
+	"GoMeeting/pkg/structs/message"
 	"GoMeeting/rpcs/meeting/models"
 	"context"
 	"database/sql"
@@ -151,7 +152,29 @@ func (l *JoinMeetingLogic) JoinMeeting(in *meeting.JoinMeetingReq) (*meeting.Res
 			Code: code.MeetingAlreadyInCode,
 		}, nil
 	}
-
+	// 发布Redis事件
+	if val > 0 {
+		// 发布新成员加入事件到 Kafka 或其他消息队列
+		eventData := message.MeetingMemberJoinNoticeData{
+			MeetingId: in.MeetingId,
+			UserId:    in.UserId,
+		}
+		eventDataJson, _ := json.Marshal(eventData)
+		event := message.Message{
+			MessageType: message.Notification_Message,
+			Method:      message.Meeting_Member_Join_Notice_Method,
+			Data:        eventDataJson,
+		}
+		eventJson, _ := json.Marshal(event)
+		// 使用 KafkaWsPusher 发布事件
+		err := l.svcCtx.KafkaWsPusher.Push(l.ctx, string(eventJson))
+		if err != nil {
+			l.Logger.Errorf("Failed to publish event to Kafka: %v", err)
+			return &meeting.Result{
+				Code: code.ErrKafkaPushCode,
+			}, nil
+		}
+	}
 	//存储成员信息到 Redis Hash
 	memberStatusKey := fmt.Sprintf(ctxdata.MeetingMemberDetailPrefix, in.MeetingId)
 	memberStatus := structs.MemberStatus{

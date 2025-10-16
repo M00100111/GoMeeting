@@ -33,9 +33,7 @@ type (
 	meetingMemberModel interface {
 		Insert(ctx context.Context, data *MeetingMember) (sql.Result, error)
 		FindOne(ctx context.Context, id uint64) (*MeetingMember, error)
-		FindOneByMeetingId(ctx context.Context, meetingId uint64) (*MeetingMember, error)
 		FindOneByMeetingIdUserId(ctx context.Context, meetingId uint64, userId uint64) (*MeetingMember, error)
-		FindOneByUserId(ctx context.Context, userId uint64) (*MeetingMember, error)
 		Update(ctx context.Context, data *MeetingMember) error
 		Delete(ctx context.Context, id uint64) error
 	}
@@ -69,13 +67,11 @@ func (m *defaultMeetingMemberModel) Delete(ctx context.Context, id uint64) error
 	}
 
 	meetingMemberIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberIdPrefix, id)
-	meetingMemberMeetingIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberMeetingIdPrefix, data.MeetingId)
 	meetingMemberMeetingIdUserIdKey := fmt.Sprintf("%s%v:%v", cacheMeetingMemberMeetingIdUserIdPrefix, data.MeetingId, data.UserId)
-	meetingMemberUserIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberUserIdPrefix, data.UserId)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, meetingMemberIdKey, meetingMemberMeetingIdKey, meetingMemberMeetingIdUserIdKey, meetingMemberUserIdKey)
+	}, meetingMemberIdKey, meetingMemberMeetingIdUserIdKey)
 	return err
 }
 
@@ -158,13 +154,11 @@ func (m *defaultMeetingMemberModel) FindOneByUserId(ctx context.Context, userId 
 
 func (m *defaultMeetingMemberModel) Insert(ctx context.Context, data *MeetingMember) (sql.Result, error) {
 	meetingMemberIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberIdPrefix, data.Id)
-	meetingMemberMeetingIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberMeetingIdPrefix, data.MeetingId)
 	meetingMemberMeetingIdUserIdKey := fmt.Sprintf("%s%v:%v", cacheMeetingMemberMeetingIdUserIdPrefix, data.MeetingId, data.UserId)
-	meetingMemberUserIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberUserIdPrefix, data.UserId)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, meetingMemberRowsExpectAutoSet)
 		return conn.ExecCtx(ctx, query, data.MeetingId, data.UserId, data.UserType, data.UserStatus, data.LastJoinTime)
-	}, meetingMemberIdKey, meetingMemberMeetingIdKey, meetingMemberMeetingIdUserIdKey, meetingMemberUserIdKey)
+	}, meetingMemberIdKey, meetingMemberMeetingIdUserIdKey)
 	return ret, err
 }
 
@@ -175,13 +169,11 @@ func (m *defaultMeetingMemberModel) Update(ctx context.Context, newData *Meeting
 	}
 
 	meetingMemberIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberIdPrefix, data.Id)
-	meetingMemberMeetingIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberMeetingIdPrefix, data.MeetingId)
 	meetingMemberMeetingIdUserIdKey := fmt.Sprintf("%s%v:%v", cacheMeetingMemberMeetingIdUserIdPrefix, data.MeetingId, data.UserId)
-	meetingMemberUserIdKey := fmt.Sprintf("%s%v", cacheMeetingMemberUserIdPrefix, data.UserId)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, meetingMemberRowsWithPlaceHolder)
 		return conn.ExecCtx(ctx, query, newData.MeetingId, newData.UserId, newData.UserType, newData.UserStatus, newData.LastJoinTime, newData.Id)
-	}, meetingMemberIdKey, meetingMemberMeetingIdKey, meetingMemberMeetingIdUserIdKey, meetingMemberUserIdKey)
+	}, meetingMemberIdKey, meetingMemberMeetingIdUserIdKey)
 	return err
 }
 

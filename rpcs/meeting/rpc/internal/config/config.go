@@ -13,4 +13,9 @@ type Config struct {
 	}
 	Cache  cache.CacheConf
 	Redisx redis.RedisConf
+
+	KafkaPusherConf struct {
+		Brokers []string
+		Topic   []string
+	}
 }

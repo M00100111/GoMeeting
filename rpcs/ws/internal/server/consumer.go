@@ -1,7 +1,7 @@
 package server
 
 import (
-	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/pkg/structs/message"
 	"context"
 	"errors"
 	"fmt"
@@ -44,6 +44,8 @@ func (c *WsConsumer) Consume(data []byte) error {
 	case message.Chat_Message:
 		return c.WsServer.routes[msg.Method](c.WsServer, msg)
 	case message.Notification_Message:
+		return c.WsServer.routes[msg.Method](c.WsServer, msg)
+	case message.WebRTC_Message:
 		return c.WsServer.routes[msg.Method](c.WsServer, msg)
 	default:
 		c.WsServer.Logger.Infof("Unknown message type: %v", msg.MessageType)

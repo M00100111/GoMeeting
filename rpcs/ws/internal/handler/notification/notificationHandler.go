@@ -1,7 +1,7 @@
 package notification
 
 import (
-	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/pkg/structs/message"
 	"GoMeeting/rpcs/ws/internal/server"
 	"encoding/json"
 )

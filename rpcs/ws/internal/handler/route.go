@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"GoMeeting/pkg/structs/message"
 	"GoMeeting/rpcs/ws/internal/handler/chat"
 	"GoMeeting/rpcs/ws/internal/handler/notification"
 	"GoMeeting/rpcs/ws/internal/handler/ping"
-	"GoMeeting/rpcs/ws/internal/message"
 	"GoMeeting/rpcs/ws/internal/server"
 )
 
@@ -25,9 +25,9 @@ func RegisterHandlers(s *server.WsServer) {
 			Method:  message.Notification_Method,
 			Handler: notification.NotificationHandler(),
 		},
-		//{
-		//	Method:  message.WebRTC_Method,
-		//	Handler: webRTC.WebRTCHandler(),
-		//},
+		{
+			Method:  message.Meeting_Member_Join_Notice_Method,
+			Handler: notification.MeetingMemberJoinNoticeHandler(),
+		},
 	})
 }

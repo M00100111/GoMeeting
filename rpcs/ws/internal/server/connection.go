@@ -1,7 +1,7 @@
 package server
 
 import (
-	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/pkg/structs/message"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"net/http"

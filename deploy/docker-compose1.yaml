@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:latest
+    container_name: meeting_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: meeting
+    ports:
+      - "7017:7017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  etcd:
+    image: bitnami/etcd:latest
+    container_name: meeting_etcd
+    environment:
+      ETCD_ENABLE_V2: "true"
+      ALLOW_NONE_AUTHENTICATION: "yes"
+    ports:
+      - "2379:2379"
+    volumes:
+      - etcd_data:/bitnami/etcd
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  redis:
+    image: redis:latest
+    container_name: meeting_redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./components/redis/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  mysql:
+    image: mysql:5.7
+    container_name: meeting_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: meeting
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: meeting_zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/kafka
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: meeting_kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: meeting_zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://your-server-ip:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/kafka
+    restart: ${RUN_MODE}
+    networks:
+      meeting:
+
+networks:
+  meeting:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  etcd_data:
+    driver: local
+  redis_data:
+    driver: local
+  mysql_data:
+    driver: local
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local

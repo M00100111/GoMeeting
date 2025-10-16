@@ -63,6 +63,11 @@ type NotificationData struct {
 //	ReceiverId string `json:"receiver_id"`
 //}
 
+type MeetingMemberJoinNoticeData struct {
+	MeetingId uint64 `json:"meetingId"`
+	UserId    uint64 `json:"userId"`
+}
+
 type MessageMethod string
 
 const (
@@ -76,6 +81,7 @@ const (
 	Meeting_Member_Leave_Notice_Method               = "Meeting_Member_Leave"
 	Meeting_Message_Method                           = "Meeting_Message"
 	//WebRTC_Method                                    = "WebRTC"
+	WebRTC_Create_Method        = "Create"
 	WebRTC_Offer_Method         = "Offer"
 	WebRTC_Answer_Method        = "Answer"
 	WebRTC_Ice_Candidate_Method = "Ice_Candidate"

@@ -2,7 +2,7 @@ package server
 
 import (
 	"GoMeeting/pkg/ctxdata"
-	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/pkg/structs/message"
 	"GoMeeting/rpcs/ws/internal/svc"
 	"encoding/json"
 	"fmt"
@@ -141,7 +141,11 @@ func (s *WsServer) addWsConn(conn *WsConn) {
 func (s *WsServer) GetWsConnByUid(uid string) *WsConn {
 	s.RWMutex.RLock()
 	defer s.RWMutex.RUnlock()
-	return s.userToConn[uid]
+	conn, exists := s.userToConn[uid]
+	if !exists {
+		return nil
+	}
+	return conn
 }
 
 func (s *WsServer) GetUidByWsConn(conn *WsConn) string {
@@ -255,27 +259,41 @@ func (s *WsServer) handleMessage(conn *WsConn) {
 					}, conn)
 				}
 			case message.WebRTC_Message:
+				fmt.Println("处理webrtc消息")
+				fmt.Println(msg)
 				fmt.Printf("接收到WebRTC请求,Type: %d,Method: %s", msg.MessageType, msg.Method)
+				fmt.Println("Data: %s", string(msg.Data))
 				var result map[string]interface{}
 				if err := json.Unmarshal(msg.Data, &result); err != nil {
 					s.Logger.Errorf("Failed to unmarshal message.Data to map[string]interface{}: %v", err)
 					return
 				}
 				result["senderId"] = s.GetUidByWsConn(conn)
-				jsonResult, err := json.Marshal(result)
-				if err != nil {
-					s.Logger.Errorf("Failed to marshal result to JSON: %v", err)
-					return
-				}
-				msg.Data = jsonResult
-				var receiverConn *WsConn
+				//jsonResult, err := json.Marshal(result)
+				//if err != nil {
+				//	s.Logger.Errorf("Failed to marshal result to JSON: %v", err)
+				//	return
+				//}
+				//msg.Data = jsonResult
 				if result["receiverId"] == nil {
 					s.Logger.Errorf("receiverId is nil")
 					return
 				}
-				receiverConn = s.GetWsConnByUid(result["receiverId"].(string))
+				//receiverId := strconv.FormatFloat(result["receiverId"].(float64), 'f', 0, 64)
+				// 替换原有的类型断言代码为以下安全处理方式：
+				var receiverId string
+				switch v := result["receiverId"].(type) {
+				case string:
+					receiverId = v
+				case float64:
+					receiverId = strconv.FormatFloat(v, 'f', 0, 64)
+				default:
+					s.Logger.Errorf("receiverId类型错误: %T", result["receiverId"])
+					return
+				}
+				receiverConn := s.GetWsConnByUid(receiverId)
 				if receiverConn != nil {
-					s.SendMessage(msg, receiverConn)
+					s.SendMessage(msg, result, receiverConn)
 				} else {
 					s.Logger.Errorf("找不到接收者连接: %s", result["receiverId"])
 				}
@@ -295,6 +313,10 @@ func (s *WsServer) SendMessage(msg *message.Message, data interface{}, conns ...
 	}
 	//群发消息可单发
 	for _, conn := range conns {
+		if conn == nil {
+			s.Logger.Errorf("Skipping nil connection")
+			continue
+		}
 		if err = conn.WriteMessage(websocket.TextMessage, result); err != nil {
 			return err
 		}

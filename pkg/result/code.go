@@ -66,6 +66,7 @@ const (
 	ErrDbOpCode = 1001 + iota
 	ErrRedisOpCode
 	ErrRecordNotExistCode
+	ErrKafkaPushCode
 	TokenErrorCode
 	TokenExpireCode
 	TokenGenerateErrorCode
@@ -117,6 +118,7 @@ var (
 	ErrDbOp            = RegisterCode(ErrDbOpCode, "数据库操作异常")
 	ErrRedisOp         = RegisterCode(ErrRedisOpCode, "Redis操作异常")
 	ErrRecordNotExist  = RegisterCode(ErrRecordNotExistCode, "记录不存在")
+	ErrKafkaPush       = RegisterCode(ErrKafkaPushCode, "kafka推送异常")
 	TokenError         = RegisterCode(TokenErrorCode, "token错误")
 	TokenGenerateError = RegisterCode(TokenGenerateErrorCode, "token生成错误")
 )

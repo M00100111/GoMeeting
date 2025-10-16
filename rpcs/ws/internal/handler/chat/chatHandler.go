@@ -2,7 +2,7 @@ package chat
 
 import (
 	"GoMeeting/pkg/ctxdata"
-	"GoMeeting/rpcs/ws/internal/message"
+	"GoMeeting/pkg/structs/message"
 	"GoMeeting/rpcs/ws/internal/server"
 	"context"
 	"encoding/json"

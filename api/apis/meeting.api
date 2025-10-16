@@ -20,6 +20,7 @@ type(
         userId uint64 `json:"-"`// 服务端填充，不在客户端 JSON 中
         meetingId uint64 `json:"meetingId"`
         password string `json:"password"`
+
         micStatus uint64 `json:"micStatus"`
         cameraStatus uint64 `json:"cameraStatus"`
         screenStatus uint64 `json:"screenStatus"`

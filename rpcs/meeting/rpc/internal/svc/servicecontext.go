@@ -3,6 +3,7 @@ package svc
 import (
 	"GoMeeting/rpcs/meeting/models"
 	"GoMeeting/rpcs/meeting/rpc/internal/config"
+	"github.com/zeromicro/go-queue/kq"
 	"github.com/zeromicro/go-zero/core/stores/redis"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
@@ -12,6 +13,8 @@ type ServiceContext struct {
 	Redis  *redis.Redis
 	models.MeetingInfoModel
 	models.MeetingMemberModel
+
+	KafkaWsPusher *kq.Pusher // 生产者
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -21,5 +24,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Redis:              redis.MustNewRedis(c.Redisx),
 		MeetingInfoModel:   models.NewMeetingInfoModel(sqlConn, c.Cache),
 		MeetingMemberModel: models.NewMeetingMemberModel(sqlConn, c.Cache),
+
+		KafkaWsPusher: kq.NewPusher(c.KafkaPusherConf.Brokers, c.KafkaPusherConf.Topic[2]),
 	}
 }

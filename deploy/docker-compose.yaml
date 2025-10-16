@@ -66,7 +66,7 @@ services:
     ports:
       - "7017:7017"
     volumes:
-      - ./components/mongo/data:/data/db
+      - ${DATA_HOST}/mongo/data:/data/db
       - /etc/localtime:/etc/localtime
     restart: ${RUN_MODE}
     networks:
